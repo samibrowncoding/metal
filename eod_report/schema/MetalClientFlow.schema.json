@@ -1,0 +1,154 @@
+{
+  "$defs": {
+    "ClientSegment": {
+      "description": "Client taxonomy used for the flow breakdown.",
+      "enum": [
+        "central_bank",
+        "producer_hedger",
+        "refiner",
+        "investment_asset_manager",
+        "industrial",
+        "hedge_fund_cta",
+        "retail_wholesale"
+      ],
+      "title": "ClientSegment",
+      "type": "string"
+    },
+    "ClientSegmentFlow": {
+      "additionalProperties": false,
+      "description": "Net client flow for one metal within one client segment.",
+      "properties": {
+        "segment": {
+          "$ref": "#/$defs/ClientSegment"
+        },
+        "net_oz": {
+          "description": "Net troy ounces; positive when the segment bought (desk sold).",
+          "title": "Net Oz",
+          "type": "number"
+        },
+        "net_usd": {
+          "description": "Net USD notional of the same flow; sign matches net_oz.",
+          "title": "Net Usd",
+          "type": "number"
+        },
+        "ticket_count": {
+          "description": "Tickets booked for this segment.",
+          "minimum": 0,
+          "title": "Ticket Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "segment",
+        "net_oz",
+        "net_usd",
+        "ticket_count"
+      ],
+      "title": "ClientSegmentFlow",
+      "type": "object"
+    },
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    },
+    "TradeSide": {
+      "description": "Side of a net flow, from the client's perspective.",
+      "enum": [
+        "buy",
+        "sell",
+        "flat"
+      ],
+      "title": "TradeSide",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Client activity in one metal across the session.",
+  "properties": {
+    "metal": {
+      "$ref": "#/$defs/Metal"
+    },
+    "net_client_side": {
+      "$ref": "#/$defs/TradeSide",
+      "description": "Direction of the aggregate client flow: buy, sell or flat."
+    },
+    "net_client_oz": {
+      "description": "Net troy ounces; positive when clients bought on balance.",
+      "title": "Net Client Oz",
+      "type": "number"
+    },
+    "net_client_usd": {
+      "description": "Net USD notional of client flow; sign matches net_client_oz.",
+      "title": "Net Client Usd",
+      "type": "number"
+    },
+    "gross_client_oz": {
+      "description": "Sum of absolute client volume in troy ounces (two-way turnover).",
+      "minimum": 0,
+      "title": "Gross Client Oz",
+      "type": "number"
+    },
+    "segment_breakdown": {
+      "description": "Net flow per client segment; sums to net_client_oz / net_client_usd.",
+      "items": {
+        "$ref": "#/$defs/ClientSegmentFlow"
+      },
+      "title": "Segment Breakdown",
+      "type": "array"
+    },
+    "top_axes": {
+      "description": "Up to three short free-text axes, most significant first.",
+      "items": {
+        "type": "string"
+      },
+      "maxItems": 3,
+      "title": "Top Axes",
+      "type": "array"
+    },
+    "unallocated_balance_change_oz": {
+      "description": "Change in client unallocated (loco London) account balances in troy ounces; positive when client metal holdings with the desk increased.",
+      "title": "Unallocated Balance Change Oz",
+      "type": "number"
+    },
+    "ticket_count": {
+      "description": "Total tickets in this metal.",
+      "minimum": 0,
+      "title": "Ticket Count",
+      "type": "integer"
+    },
+    "average_ticket_size_oz": {
+      "description": "Gross ounces divided by ticket_count.",
+      "minimum": 0,
+      "title": "Average Ticket Size Oz",
+      "type": "number"
+    },
+    "average_ticket_size_usd": {
+      "description": "Gross USD notional divided by ticket_count.",
+      "minimum": 0,
+      "title": "Average Ticket Size Usd",
+      "type": "number"
+    }
+  },
+  "required": [
+    "metal",
+    "net_client_side",
+    "net_client_oz",
+    "net_client_usd",
+    "gross_client_oz",
+    "segment_breakdown",
+    "top_axes",
+    "unallocated_balance_change_oz",
+    "ticket_count",
+    "average_ticket_size_oz",
+    "average_ticket_size_usd"
+  ],
+  "title": "MetalClientFlow",
+  "type": "object"
+}

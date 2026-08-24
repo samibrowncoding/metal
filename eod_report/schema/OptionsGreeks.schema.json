@@ -1,0 +1,51 @@
+{
+  "$defs": {
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Options book greeks for one metal, expressed per-metal not per-strike.",
+  "properties": {
+    "metal": {
+      "$ref": "#/$defs/Metal"
+    },
+    "delta_oz": {
+      "description": "Options delta in troy ounces; positive long.",
+      "title": "Delta Oz",
+      "type": "number"
+    },
+    "gamma_oz_per_pct": {
+      "description": "Change in delta (troy ounces) for a +1% move in spot.",
+      "title": "Gamma Oz Per Pct",
+      "type": "number"
+    },
+    "vega_usd_per_vol_pt": {
+      "description": "P&L in USD for a +1 volatility point move in implied vol.",
+      "title": "Vega Usd Per Vol Pt",
+      "type": "number"
+    },
+    "theta_usd_per_day": {
+      "description": "Expected P&L in USD from one calendar day of time decay; usually negative when long options.",
+      "title": "Theta Usd Per Day",
+      "type": "number"
+    }
+  },
+  "required": [
+    "metal",
+    "delta_oz",
+    "gamma_oz_per_pct",
+    "vega_usd_per_vol_pt",
+    "theta_usd_per_day"
+  ],
+  "title": "OptionsGreeks",
+  "type": "object"
+}

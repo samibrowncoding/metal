@@ -1,0 +1,97 @@
+{
+  "$defs": {
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Open interest and volume for one COMEX contract.",
+  "properties": {
+    "contract_code": {
+      "description": "Exchange root, e.g. \"GC\", \"SI\", \"PL\", \"PA\".",
+      "title": "Contract Code",
+      "type": "string"
+    },
+    "metal": {
+      "$ref": "#/$defs/Metal"
+    },
+    "contract_size_oz": {
+      "description": "Troy ounces per contract.",
+      "exclusiveMinimum": 0,
+      "title": "Contract Size Oz",
+      "type": "number"
+    },
+    "open_interest_lots": {
+      "description": "Total open interest in contracts.",
+      "minimum": 0,
+      "title": "Open Interest Lots",
+      "type": "integer"
+    },
+    "open_interest_change_lots": {
+      "description": "Day-on-day change in open interest, in contracts; signed.",
+      "title": "Open Interest Change Lots",
+      "type": "integer"
+    },
+    "session_volume_lots": {
+      "description": "Session volume in contracts.",
+      "minimum": 0,
+      "title": "Session Volume Lots",
+      "type": "integer"
+    },
+    "volume_20d_average_lots": {
+      "description": "Trailing 20-session average volume in contracts.",
+      "minimum": 0,
+      "title": "Volume 20D Average Lots",
+      "type": "integer"
+    },
+    "volume_vs_20d_average_pct": {
+      "description": "Session volume as a percent deviation from the 20-day average; signed.",
+      "title": "Volume Vs 20D Average Pct",
+      "type": "number"
+    },
+    "front_month_code": {
+      "description": "Front month, e.g. \"GCZ6\".",
+      "title": "Front Month Code",
+      "type": "string"
+    },
+    "front_month_expiry_date": {
+      "format": "date",
+      "title": "Front Month Expiry Date",
+      "type": "string"
+    },
+    "next_active_month_code": {
+      "description": "Next active delivery month code.",
+      "title": "Next Active Month Code",
+      "type": "string"
+    },
+    "next_active_expiry_date": {
+      "format": "date",
+      "title": "Next Active Expiry Date",
+      "type": "string"
+    }
+  },
+  "required": [
+    "contract_code",
+    "metal",
+    "contract_size_oz",
+    "open_interest_lots",
+    "open_interest_change_lots",
+    "session_volume_lots",
+    "volume_20d_average_lots",
+    "volume_vs_20d_average_pct",
+    "front_month_code",
+    "front_month_expiry_date",
+    "next_active_month_code",
+    "next_active_expiry_date"
+  ],
+  "title": "ComexContractActivity",
+  "type": "object"
+}

@@ -1,0 +1,43 @@
+{
+  "additionalProperties": false,
+  "description": "Utilisation of one desk risk limit.",
+  "properties": {
+    "limit_name": {
+      "description": "Limit as named in the desk mandate.",
+      "title": "Limit Name",
+      "type": "string"
+    },
+    "limit_usd": {
+      "description": "Approved limit in USD.",
+      "exclusiveMinimum": 0,
+      "title": "Limit Usd",
+      "type": "number"
+    },
+    "utilisation_usd": {
+      "description": "Current usage in USD (absolute exposure against the limit).",
+      "minimum": 0,
+      "title": "Utilisation Usd",
+      "type": "number"
+    },
+    "utilisation_pct": {
+      "description": "utilisation_usd as a percent of limit_usd; 82.5 = 82.5%.",
+      "minimum": 0,
+      "title": "Utilisation Pct",
+      "type": "number"
+    },
+    "above_warning_threshold": {
+      "description": "True when utilisation_pct is at or above the configured warning level (80%).",
+      "title": "Above Warning Threshold",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "limit_name",
+    "limit_usd",
+    "utilisation_usd",
+    "utilisation_pct",
+    "above_warning_threshold"
+  ],
+  "title": "LimitUtilisation",
+  "type": "object"
+}

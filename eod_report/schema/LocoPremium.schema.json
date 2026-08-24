@@ -1,0 +1,39 @@
+{
+  "$defs": {
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Physical premium in one location versus loco London.",
+  "properties": {
+    "location": {
+      "description": "Trading centre, e.g. \"Zurich\", \"Singapore\".",
+      "title": "Location",
+      "type": "string"
+    },
+    "metal": {
+      "$ref": "#/$defs/Metal"
+    },
+    "premium_usd_per_oz": {
+      "description": "Premium over loco London in USD per troy ounce; negative is a discount.",
+      "title": "Premium Usd Per Oz",
+      "type": "number"
+    }
+  },
+  "required": [
+    "location",
+    "metal",
+    "premium_usd_per_oz"
+  ],
+  "title": "LocoPremium",
+  "type": "object"
+}

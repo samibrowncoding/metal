@@ -1,0 +1,66 @@
+{
+  "$defs": {
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "COMEX depository stocks for one metal, in troy ounces.",
+  "properties": {
+    "metal": {
+      "$ref": "#/$defs/Metal"
+    },
+    "registered_oz": {
+      "description": "Registered (deliverable) stocks.",
+      "minimum": 0,
+      "title": "Registered Oz",
+      "type": "number"
+    },
+    "eligible_oz": {
+      "description": "Eligible (warranted but not offered) stocks.",
+      "minimum": 0,
+      "title": "Eligible Oz",
+      "type": "number"
+    },
+    "total_oz": {
+      "description": "registered_oz plus eligible_oz.",
+      "minimum": 0,
+      "title": "Total Oz",
+      "type": "number"
+    },
+    "registered_change_oz": {
+      "description": "Day-on-day change in registered stocks; positive is metal in.",
+      "title": "Registered Change Oz",
+      "type": "number"
+    },
+    "eligible_change_oz": {
+      "description": "Day-on-day change in eligible stocks; positive is metal in.",
+      "title": "Eligible Change Oz",
+      "type": "number"
+    },
+    "total_change_oz": {
+      "description": "Day-on-day change in total stocks; signed.",
+      "title": "Total Change Oz",
+      "type": "number"
+    }
+  },
+  "required": [
+    "metal",
+    "registered_oz",
+    "eligible_oz",
+    "total_oz",
+    "registered_change_oz",
+    "eligible_change_oz",
+    "total_change_oz"
+  ],
+  "title": "ComexStocks",
+  "type": "object"
+}

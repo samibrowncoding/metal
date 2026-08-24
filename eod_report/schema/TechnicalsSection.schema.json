@@ -1,0 +1,243 @@
+{
+  "$defs": {
+    "LevelType": {
+      "description": "Whether a technical level sits below (support) or above (resistance).",
+      "enum": [
+        "support",
+        "resistance"
+      ],
+      "title": "LevelType",
+      "type": "string"
+    },
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    },
+    "MetalTechnicals": {
+      "additionalProperties": false,
+      "description": "Technical picture for one metal at the London close.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "close_usd_per_oz": {
+          "description": "Close the technicals are measured against.",
+          "title": "Close Usd Per Oz",
+          "type": "number"
+        },
+        "ma_50_usd_per_oz": {
+          "description": "50-session simple moving average of closes.",
+          "title": "Ma 50 Usd Per Oz",
+          "type": "number"
+        },
+        "ma_100_usd_per_oz": {
+          "description": "100-session simple moving average of closes.",
+          "title": "Ma 100 Usd Per Oz",
+          "type": "number"
+        },
+        "ma_200_usd_per_oz": {
+          "description": "200-session simple moving average of closes.",
+          "title": "Ma 200 Usd Per Oz",
+          "type": "number"
+        },
+        "rsi_14": {
+          "description": "14-session Wilder RSI, 0-100.",
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Rsi 14",
+          "type": "number"
+        },
+        "support_levels": {
+          "description": "Key supports, nearest to the market first.",
+          "items": {
+            "$ref": "#/$defs/TechnicalLevel"
+          },
+          "title": "Support Levels",
+          "type": "array"
+        },
+        "resistance_levels": {
+          "description": "Key resistances, nearest to the market first.",
+          "items": {
+            "$ref": "#/$defs/TechnicalLevel"
+          },
+          "title": "Resistance Levels",
+          "type": "array"
+        },
+        "trend_label": {
+          "$ref": "#/$defs/TrendLabel"
+        },
+        "nearest_level_type": {
+          "$ref": "#/$defs/LevelType",
+          "description": "Whether the nearest level of any kind is support or resistance."
+        },
+        "nearest_level_usd_per_oz": {
+          "description": "Price of that nearest level.",
+          "title": "Nearest Level Usd Per Oz",
+          "type": "number"
+        },
+        "distance_to_nearest_level_pct": {
+          "description": "Absolute distance from close to the nearest level, in percent.",
+          "title": "Distance To Nearest Level Pct",
+          "type": "number"
+        },
+        "realised_vol_1m_pct": {
+          "description": "Annualised realised volatility over the last 21 sessions, in percent.",
+          "minimum": 0,
+          "title": "Realised Vol 1M Pct",
+          "type": "number"
+        },
+        "implied_vol_1m_pct": {
+          "description": "1-month at-the-money implied volatility, in percent.",
+          "minimum": 0,
+          "title": "Implied Vol 1M Pct",
+          "type": "number"
+        },
+        "vol_spread_pct": {
+          "description": "implied_vol_1m_pct minus realised_vol_1m_pct, in volatility points.",
+          "title": "Vol Spread Pct",
+          "type": "number"
+        },
+        "price_history": {
+          "description": "Daily bars ending on the report date, oldest first. Long enough to draw the 200-day moving average.",
+          "items": {
+            "$ref": "#/$defs/PriceBar"
+          },
+          "title": "Price History",
+          "type": "array"
+        }
+      },
+      "required": [
+        "metal",
+        "close_usd_per_oz",
+        "ma_50_usd_per_oz",
+        "ma_100_usd_per_oz",
+        "ma_200_usd_per_oz",
+        "rsi_14",
+        "support_levels",
+        "resistance_levels",
+        "trend_label",
+        "nearest_level_type",
+        "nearest_level_usd_per_oz",
+        "distance_to_nearest_level_pct",
+        "realised_vol_1m_pct",
+        "implied_vol_1m_pct",
+        "vol_spread_pct",
+        "price_history"
+      ],
+      "title": "MetalTechnicals",
+      "type": "object"
+    },
+    "PriceBar": {
+      "additionalProperties": false,
+      "description": "One daily OHLC bar of spot history, USD per troy ounce.",
+      "properties": {
+        "session_date": {
+          "format": "date",
+          "title": "Session Date",
+          "type": "string"
+        },
+        "open_usd_per_oz": {
+          "title": "Open Usd Per Oz",
+          "type": "number"
+        },
+        "high_usd_per_oz": {
+          "title": "High Usd Per Oz",
+          "type": "number"
+        },
+        "low_usd_per_oz": {
+          "title": "Low Usd Per Oz",
+          "type": "number"
+        },
+        "close_usd_per_oz": {
+          "title": "Close Usd Per Oz",
+          "type": "number"
+        }
+      },
+      "required": [
+        "session_date",
+        "open_usd_per_oz",
+        "high_usd_per_oz",
+        "low_usd_per_oz",
+        "close_usd_per_oz"
+      ],
+      "title": "PriceBar",
+      "type": "object"
+    },
+    "TechnicalLevel": {
+      "additionalProperties": false,
+      "description": "A single support or resistance level.",
+      "properties": {
+        "level_type": {
+          "$ref": "#/$defs/LevelType"
+        },
+        "price_usd_per_oz": {
+          "title": "Price Usd Per Oz",
+          "type": "number"
+        },
+        "label": {
+          "description": "Short human label, e.g. \"prior range low\", \"38.2% retracement\".",
+          "title": "Label",
+          "type": "string"
+        },
+        "distance_pct": {
+          "description": "Signed distance from the current close to this level, in percent of the close; positive when the level is above the market.",
+          "title": "Distance Pct",
+          "type": "number"
+        }
+      },
+      "required": [
+        "level_type",
+        "price_usd_per_oz",
+        "label",
+        "distance_pct"
+      ],
+      "title": "TechnicalLevel",
+      "type": "object"
+    },
+    "TrendLabel": {
+      "description": "Analyst-facing trend classification from the technical screen.",
+      "enum": [
+        "uptrend",
+        "range",
+        "downtrend"
+      ],
+      "title": "TrendLabel",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Section 3. One technical block per metal plus charting defaults.\n\nThe app charts a single analyst-selected metal rather than four charts, so\nthe section carries a default selection.",
+  "properties": {
+    "metals": {
+      "items": {
+        "$ref": "#/$defs/MetalTechnicals"
+      },
+      "title": "Metals",
+      "type": "array"
+    },
+    "default_chart_metal": {
+      "$ref": "#/$defs/Metal",
+      "description": "Metal charted when the analyst has not chosen one."
+    },
+    "history_session_count": {
+      "description": "Number of bars supplied per metal in price_history.",
+      "exclusiveMinimum": 0,
+      "title": "History Session Count",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "metals",
+    "default_chart_metal",
+    "history_session_count"
+  ],
+  "title": "TechnicalsSection",
+  "type": "object"
+}

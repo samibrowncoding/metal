@@ -1,0 +1,84 @@
+{
+  "additionalProperties": false,
+  "description": "Analyst free text, persisted per report date.\n\nEvery field is optional and an empty string means \"omit this block from the\nemail\" \u2014 the renderer never emits a heading with no body. Keys match\n``SectionKey`` so the Rust side can hold this as a map if preferred.",
+  "properties": {
+    "report_date": {
+      "format": "date",
+      "title": "Report Date",
+      "type": "string"
+    },
+    "author_name": {
+      "default": "",
+      "description": "Analyst who wrote the commentary.",
+      "title": "Author Name",
+      "type": "string"
+    },
+    "headline": {
+      "default": "",
+      "description": "One-line headline for the email subject area.",
+      "title": "Headline",
+      "type": "string"
+    },
+    "market_overview": {
+      "default": "",
+      "description": "Top-level paragraph.",
+      "title": "Market Overview",
+      "type": "string"
+    },
+    "client_flows": {
+      "default": "",
+      "title": "Client Flows",
+      "type": "string"
+    },
+    "risk": {
+      "default": "",
+      "title": "Risk",
+      "type": "string"
+    },
+    "technicals": {
+      "default": "",
+      "title": "Technicals",
+      "type": "string"
+    },
+    "etf_flows": {
+      "default": "",
+      "title": "Etf Flows",
+      "type": "string"
+    },
+    "positioning": {
+      "default": "",
+      "title": "Positioning",
+      "type": "string"
+    },
+    "physical": {
+      "default": "",
+      "title": "Physical",
+      "type": "string"
+    },
+    "look_ahead": {
+      "default": "",
+      "description": "The \"what we are watching\" box.",
+      "title": "Look Ahead",
+      "type": "string"
+    },
+    "saved_at_london": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "When the draft was last saved; null if never saved.",
+      "title": "Saved At London"
+    }
+  },
+  "required": [
+    "report_date"
+  ],
+  "title": "Commentary",
+  "type": "object"
+}

@@ -1,0 +1,71 @@
+{
+  "$defs": {
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Managed money positioning from the CFTC Commitments of Traders report.\n\nThe COT lags: it is surveyed on a Tuesday and published the following\nFriday afternoon, so ``report_date`` is always earlier than the report date\nand must be shown to the reader.",
+  "properties": {
+    "metal": {
+      "$ref": "#/$defs/Metal"
+    },
+    "report_date": {
+      "description": "Tuesday the COT position was surveyed.",
+      "format": "date",
+      "title": "Report Date",
+      "type": "string"
+    },
+    "published_date": {
+      "description": "Friday the report was released by the CFTC.",
+      "format": "date",
+      "title": "Published Date",
+      "type": "string"
+    },
+    "managed_money_long_lots": {
+      "minimum": 0,
+      "title": "Managed Money Long Lots",
+      "type": "integer"
+    },
+    "managed_money_short_lots": {
+      "minimum": 0,
+      "title": "Managed Money Short Lots",
+      "type": "integer"
+    },
+    "managed_money_net_lots": {
+      "description": "Long minus short, in contracts; signed.",
+      "title": "Managed Money Net Lots",
+      "type": "integer"
+    },
+    "net_change_wow_lots": {
+      "description": "Week-on-week change in the net position, in contracts; signed.",
+      "title": "Net Change Wow Lots",
+      "type": "integer"
+    },
+    "net_oz": {
+      "description": "Net position converted to troy ounces using contract_size_oz.",
+      "title": "Net Oz",
+      "type": "number"
+    }
+  },
+  "required": [
+    "metal",
+    "report_date",
+    "published_date",
+    "managed_money_long_lots",
+    "managed_money_short_lots",
+    "managed_money_net_lots",
+    "net_change_wow_lots",
+    "net_oz"
+  ],
+  "title": "CotManagedMoney",
+  "type": "object"
+}

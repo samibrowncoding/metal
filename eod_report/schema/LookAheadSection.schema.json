@@ -1,0 +1,231 @@
+{
+  "$defs": {
+    "CalendarEvent": {
+      "additionalProperties": false,
+      "description": "One dated entry in the forward calendar.",
+      "properties": {
+        "event_date": {
+          "format": "date",
+          "title": "Event Date",
+          "type": "string"
+        },
+        "event_time_london": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Time of day in London as \"HH:MM\" (24h), or null for all-day entries.",
+          "title": "Event Time London"
+        },
+        "category": {
+          "$ref": "#/$defs/EventCategory"
+        },
+        "region": {
+          "description": "Market affected, e.g. \"US\", \"UK\", \"Euro area\", \"China\".",
+          "title": "Region",
+          "type": "string"
+        },
+        "event_name": {
+          "title": "Event Name",
+          "type": "string"
+        },
+        "consensus": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Consensus expectation as displayed text, including its unit; null if none.",
+          "title": "Consensus"
+        },
+        "previous": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Prior reading as displayed text; null if none.",
+          "title": "Previous"
+        },
+        "importance": {
+          "$ref": "#/$defs/EventImportance"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Desk note, e.g. which metal is most exposed.",
+          "title": "Note"
+        }
+      },
+      "required": [
+        "event_date",
+        "category",
+        "region",
+        "event_name",
+        "importance"
+      ],
+      "title": "CalendarEvent",
+      "type": "object"
+    },
+    "ContractRollWindow": {
+      "additionalProperties": false,
+      "description": "First notice, expiry and roll window for one COMEX contract.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "contract_code": {
+          "description": "Full contract code, e.g. \"GCZ6\".",
+          "title": "Contract Code",
+          "type": "string"
+        },
+        "first_notice_date": {
+          "description": "COMEX first notice day for the delivery month.",
+          "format": "date",
+          "title": "First Notice Date",
+          "type": "string"
+        },
+        "last_trade_date": {
+          "description": "Final trading day of the contract.",
+          "format": "date",
+          "title": "Last Trade Date",
+          "type": "string"
+        },
+        "roll_window_start_date": {
+          "format": "date",
+          "title": "Roll Window Start Date",
+          "type": "string"
+        },
+        "roll_window_end_date": {
+          "format": "date",
+          "title": "Roll Window End Date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "metal",
+        "contract_code",
+        "first_notice_date",
+        "last_trade_date",
+        "roll_window_start_date",
+        "roll_window_end_date"
+      ],
+      "title": "ContractRollWindow",
+      "type": "object"
+    },
+    "EventCategory": {
+      "description": "Kind of calendar entry in the look-ahead section.",
+      "enum": [
+        "economic_release",
+        "central_bank",
+        "comex_first_notice",
+        "contract_expiry",
+        "roll_window",
+        "lbma_auction",
+        "holiday"
+      ],
+      "title": "EventCategory",
+      "type": "string"
+    },
+    "EventImportance": {
+      "description": "Desk's own ranking of how much an event is likely to matter.",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ],
+      "title": "EventImportance",
+      "type": "string"
+    },
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Section 7. Next session and next week.\n\n``next_session_events`` covers the following trading day only;\n``next_week_events`` covers the balance of the forward week.",
+  "properties": {
+    "next_session_date": {
+      "format": "date",
+      "title": "Next Session Date",
+      "type": "string"
+    },
+    "next_session_events": {
+      "items": {
+        "$ref": "#/$defs/CalendarEvent"
+      },
+      "title": "Next Session Events",
+      "type": "array"
+    },
+    "next_week_start_date": {
+      "format": "date",
+      "title": "Next Week Start Date",
+      "type": "string"
+    },
+    "next_week_end_date": {
+      "format": "date",
+      "title": "Next Week End Date",
+      "type": "string"
+    },
+    "next_week_events": {
+      "items": {
+        "$ref": "#/$defs/CalendarEvent"
+      },
+      "title": "Next Week Events",
+      "type": "array"
+    },
+    "roll_windows": {
+      "items": {
+        "$ref": "#/$defs/ContractRollWindow"
+      },
+      "title": "Roll Windows",
+      "type": "array"
+    },
+    "holidays": {
+      "description": "Holiday entries affecting London, New York or Shanghai liquidity.",
+      "items": {
+        "$ref": "#/$defs/CalendarEvent"
+      },
+      "title": "Holidays",
+      "type": "array"
+    }
+  },
+  "required": [
+    "next_session_date",
+    "next_session_events",
+    "next_week_start_date",
+    "next_week_end_date",
+    "next_week_events",
+    "roll_windows",
+    "holidays"
+  ],
+  "title": "LookAheadSection",
+  "type": "object"
+}

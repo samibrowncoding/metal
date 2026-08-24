@@ -1,0 +1,39 @@
+{
+  "$defs": {
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Metal lease rates for one metal, annualised percent.",
+  "properties": {
+    "metal": {
+      "$ref": "#/$defs/Metal"
+    },
+    "lease_rate_1m_pct": {
+      "description": "1-month lease rate, annualised percent.",
+      "title": "Lease Rate 1M Pct",
+      "type": "number"
+    },
+    "lease_rate_3m_pct": {
+      "description": "3-month lease rate, annualised percent.",
+      "title": "Lease Rate 3M Pct",
+      "type": "number"
+    }
+  },
+  "required": [
+    "metal",
+    "lease_rate_1m_pct",
+    "lease_rate_3m_pct"
+  ],
+  "title": "LeaseRate",
+  "type": "object"
+}

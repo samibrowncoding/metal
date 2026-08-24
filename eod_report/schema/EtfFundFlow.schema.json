@@ -1,0 +1,88 @@
+{
+  "$defs": {
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Holdings and flows for one exchange traded product.\n\nIn production these figures are **T+1**: issuers publish the prior day's\nholdings in the morning, so the line reported at today's London close is\nyesterday's bar. ``as_of_date`` on the section states the effective date.",
+  "properties": {
+    "ticker": {
+      "description": "Listing ticker, or \"OTHER\" for the aggregate line.",
+      "title": "Ticker",
+      "type": "string"
+    },
+    "fund_name": {
+      "title": "Fund Name",
+      "type": "string"
+    },
+    "metal": {
+      "$ref": "#/$defs/Metal"
+    },
+    "holdings_tonnes": {
+      "description": "Total metal held, in metric tonnes.",
+      "minimum": 0,
+      "title": "Holdings Tonnes",
+      "type": "number"
+    },
+    "daily_change_tonnes": {
+      "description": "Change in holdings vs the prior report, in tonnes; positive is a creation.",
+      "title": "Daily Change Tonnes",
+      "type": "number"
+    },
+    "daily_change_usd": {
+      "description": "Daily change valued at the session close, in USD; sign matches tonnes.",
+      "title": "Daily Change Usd",
+      "type": "number"
+    },
+    "aum_usd": {
+      "description": "Assets under management in USD.",
+      "minimum": 0,
+      "title": "Aum Usd",
+      "type": "number"
+    },
+    "wtd_flow_tonnes": {
+      "description": "Week-to-date cumulative flow in tonnes; signed.",
+      "title": "Wtd Flow Tonnes",
+      "type": "number"
+    },
+    "mtd_flow_tonnes": {
+      "description": "Month-to-date cumulative flow in tonnes; signed.",
+      "title": "Mtd Flow Tonnes",
+      "type": "number"
+    },
+    "ytd_flow_tonnes": {
+      "description": "Year-to-date cumulative flow in tonnes; signed.",
+      "title": "Ytd Flow Tonnes",
+      "type": "number"
+    },
+    "ytd_flow_usd": {
+      "description": "Year-to-date cumulative flow valued in USD; signed.",
+      "title": "Ytd Flow Usd",
+      "type": "number"
+    }
+  },
+  "required": [
+    "ticker",
+    "fund_name",
+    "metal",
+    "holdings_tonnes",
+    "daily_change_tonnes",
+    "daily_change_usd",
+    "aum_usd",
+    "wtd_flow_tonnes",
+    "mtd_flow_tonnes",
+    "ytd_flow_tonnes",
+    "ytd_flow_usd"
+  ],
+  "title": "EtfFundFlow",
+  "type": "object"
+}

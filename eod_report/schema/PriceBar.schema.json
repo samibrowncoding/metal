@@ -1,0 +1,36 @@
+{
+  "additionalProperties": false,
+  "description": "One daily OHLC bar of spot history, USD per troy ounce.",
+  "properties": {
+    "session_date": {
+      "format": "date",
+      "title": "Session Date",
+      "type": "string"
+    },
+    "open_usd_per_oz": {
+      "title": "Open Usd Per Oz",
+      "type": "number"
+    },
+    "high_usd_per_oz": {
+      "title": "High Usd Per Oz",
+      "type": "number"
+    },
+    "low_usd_per_oz": {
+      "title": "Low Usd Per Oz",
+      "type": "number"
+    },
+    "close_usd_per_oz": {
+      "title": "Close Usd Per Oz",
+      "type": "number"
+    }
+  },
+  "required": [
+    "session_date",
+    "open_usd_per_oz",
+    "high_usd_per_oz",
+    "low_usd_per_oz",
+    "close_usd_per_oz"
+  ],
+  "title": "PriceBar",
+  "type": "object"
+}

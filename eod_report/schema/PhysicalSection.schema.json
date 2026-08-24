@@ -1,0 +1,254 @@
+{
+  "$defs": {
+    "ComexStocks": {
+      "additionalProperties": false,
+      "description": "COMEX depository stocks for one metal, in troy ounces.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "registered_oz": {
+          "description": "Registered (deliverable) stocks.",
+          "minimum": 0,
+          "title": "Registered Oz",
+          "type": "number"
+        },
+        "eligible_oz": {
+          "description": "Eligible (warranted but not offered) stocks.",
+          "minimum": 0,
+          "title": "Eligible Oz",
+          "type": "number"
+        },
+        "total_oz": {
+          "description": "registered_oz plus eligible_oz.",
+          "minimum": 0,
+          "title": "Total Oz",
+          "type": "number"
+        },
+        "registered_change_oz": {
+          "description": "Day-on-day change in registered stocks; positive is metal in.",
+          "title": "Registered Change Oz",
+          "type": "number"
+        },
+        "eligible_change_oz": {
+          "description": "Day-on-day change in eligible stocks; positive is metal in.",
+          "title": "Eligible Change Oz",
+          "type": "number"
+        },
+        "total_change_oz": {
+          "description": "Day-on-day change in total stocks; signed.",
+          "title": "Total Change Oz",
+          "type": "number"
+        }
+      },
+      "required": [
+        "metal",
+        "registered_oz",
+        "eligible_oz",
+        "total_oz",
+        "registered_change_oz",
+        "eligible_change_oz",
+        "total_change_oz"
+      ],
+      "title": "ComexStocks",
+      "type": "object"
+    },
+    "LbmaVaultHolding": {
+      "additionalProperties": false,
+      "description": "LBMA London vaulted holdings for one metal.\n\nLBMA publishes vault holdings **monthly**, around the twentieth of the\nfollowing month, so this is the most recent month-end rather than today.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "holdings_tonnes": {
+          "description": "Vaulted metal in London, in tonnes.",
+          "minimum": 0,
+          "title": "Holdings Tonnes",
+          "type": "number"
+        },
+        "month_change_tonnes": {
+          "description": "Change vs the prior published month, in tonnes; signed.",
+          "title": "Month Change Tonnes",
+          "type": "number"
+        },
+        "month_change_pct": {
+          "description": "The same change in percent; signed.",
+          "title": "Month Change Pct",
+          "type": "number"
+        },
+        "as_of_month_end": {
+          "description": "Month-end the holdings refer to.",
+          "format": "date",
+          "title": "As Of Month End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "metal",
+        "holdings_tonnes",
+        "month_change_tonnes",
+        "month_change_pct",
+        "as_of_month_end"
+      ],
+      "title": "LbmaVaultHolding",
+      "type": "object"
+    },
+    "LeaseRate": {
+      "additionalProperties": false,
+      "description": "Metal lease rates for one metal, annualised percent.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "lease_rate_1m_pct": {
+          "description": "1-month lease rate, annualised percent.",
+          "title": "Lease Rate 1M Pct",
+          "type": "number"
+        },
+        "lease_rate_3m_pct": {
+          "description": "3-month lease rate, annualised percent.",
+          "title": "Lease Rate 3M Pct",
+          "type": "number"
+        }
+      },
+      "required": [
+        "metal",
+        "lease_rate_1m_pct",
+        "lease_rate_3m_pct"
+      ],
+      "title": "LeaseRate",
+      "type": "object"
+    },
+    "LocoPremium": {
+      "additionalProperties": false,
+      "description": "Physical premium in one location versus loco London.",
+      "properties": {
+        "location": {
+          "description": "Trading centre, e.g. \"Zurich\", \"Singapore\".",
+          "title": "Location",
+          "type": "string"
+        },
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "premium_usd_per_oz": {
+          "description": "Premium over loco London in USD per troy ounce; negative is a discount.",
+          "title": "Premium Usd Per Oz",
+          "type": "number"
+        }
+      },
+      "required": [
+        "location",
+        "metal",
+        "premium_usd_per_oz"
+      ],
+      "title": "LocoPremium",
+      "type": "object"
+    },
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    },
+    "SgeActivity": {
+      "additionalProperties": false,
+      "description": "Shanghai Gold Exchange withdrawals and the Shanghai premium.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "withdrawals_tonnes": {
+          "description": "Metal withdrawn from SGE vaults over the reporting week, in tonnes.",
+          "minimum": 0,
+          "title": "Withdrawals Tonnes",
+          "type": "number"
+        },
+        "withdrawals_period_days": {
+          "description": "Length of the withdrawal reporting period, in days.",
+          "exclusiveMinimum": 0,
+          "title": "Withdrawals Period Days",
+          "type": "integer"
+        },
+        "premium_usd_per_oz": {
+          "description": "Shanghai price versus loco London in USD per troy ounce; positive is a premium, negative a discount.",
+          "title": "Premium Usd Per Oz",
+          "type": "number"
+        },
+        "premium_pct": {
+          "description": "The same premium as a percent of loco London; signed.",
+          "title": "Premium Pct",
+          "type": "number"
+        }
+      },
+      "required": [
+        "metal",
+        "withdrawals_tonnes",
+        "withdrawals_period_days",
+        "premium_usd_per_oz",
+        "premium_pct"
+      ],
+      "title": "SgeActivity",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Section 6. Inventories, regional premiums and lease rates.\n\nMixed frequencies: COMEX stocks are daily, SGE withdrawals weekly, LBMA\nvault holdings monthly. Each model states its own effective period.",
+  "properties": {
+    "comex_stocks": {
+      "items": {
+        "$ref": "#/$defs/ComexStocks"
+      },
+      "title": "Comex Stocks",
+      "type": "array"
+    },
+    "lbma_vault_holdings": {
+      "items": {
+        "$ref": "#/$defs/LbmaVaultHolding"
+      },
+      "title": "Lbma Vault Holdings",
+      "type": "array"
+    },
+    "lbma_monthly_note": {
+      "description": "Human-readable note explaining the monthly LBMA publication lag.",
+      "title": "Lbma Monthly Note",
+      "type": "string"
+    },
+    "sge": {
+      "items": {
+        "$ref": "#/$defs/SgeActivity"
+      },
+      "title": "Sge",
+      "type": "array"
+    },
+    "loco_premiums": {
+      "items": {
+        "$ref": "#/$defs/LocoPremium"
+      },
+      "title": "Loco Premiums",
+      "type": "array"
+    },
+    "lease_rates": {
+      "items": {
+        "$ref": "#/$defs/LeaseRate"
+      },
+      "title": "Lease Rates",
+      "type": "array"
+    }
+  },
+  "required": [
+    "comex_stocks",
+    "lbma_vault_holdings",
+    "lbma_monthly_note",
+    "sge",
+    "loco_premiums",
+    "lease_rates"
+  ],
+  "title": "PhysicalSection",
+  "type": "object"
+}

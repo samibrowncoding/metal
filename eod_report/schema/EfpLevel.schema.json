@@ -1,0 +1,51 @@
+{
+  "$defs": {
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Exchange for physical level for one metal, USD per troy ounce.",
+  "properties": {
+    "metal": {
+      "$ref": "#/$defs/Metal"
+    },
+    "efp_usd_per_oz": {
+      "description": "Front-month EFP: futures minus loco London spot; signed.",
+      "title": "Efp Usd Per Oz",
+      "type": "number"
+    },
+    "recent_range_low_usd_per_oz": {
+      "description": "Low of the trailing 20-session EFP range.",
+      "title": "Recent Range Low Usd Per Oz",
+      "type": "number"
+    },
+    "recent_range_high_usd_per_oz": {
+      "description": "High of the trailing 20-session EFP range.",
+      "title": "Recent Range High Usd Per Oz",
+      "type": "number"
+    },
+    "outside_recent_range": {
+      "description": "True when efp_usd_per_oz sits outside the trailing range \u2014 a dislocation flag.",
+      "title": "Outside Recent Range",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "metal",
+    "efp_usd_per_oz",
+    "recent_range_low_usd_per_oz",
+    "recent_range_high_usd_per_oz",
+    "outside_recent_range"
+  ],
+  "title": "EfpLevel",
+  "type": "object"
+}

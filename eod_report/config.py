@@ -138,14 +138,23 @@ class ContractSpec:
     contract_size_oz: float
     #: Delivery months quoted as single-letter codes, in calendar order.
     active_months: tuple[str, ...]
+    #: Anchor for fabricated total open interest, in contracts.
+    open_interest_lots: int
+    #: Anchor for fabricated session volume, in contracts.
+    session_volume_lots: int
+    #: Anchor for the front-month EFP, in USD per troy ounce.
+    efp_usd_per_oz: float
 
 
 COMEX_CONTRACTS: dict[str, ContractSpec] = {
-    "XAU": ContractSpec("GC", 100.0, ("G", "J", "M", "Q", "Z")),
-    "XAG": ContractSpec("SI", 5_000.0, ("H", "K", "N", "U", "Z")),
-    "XPT": ContractSpec("PL", 50.0, ("F", "J", "N", "V")),
-    "XPD": ContractSpec("PA", 100.0, ("H", "M", "U", "Z")),
+    "XAU": ContractSpec("GC", 100.0, ("G", "J", "M", "Q", "Z"), 485_000, 168_000, 4.20),
+    "XAG": ContractSpec("SI", 5_000.0, ("H", "K", "N", "U", "Z"), 152_000, 62_000, 0.075),
+    "XPT": ContractSpec("PL", 50.0, ("F", "J", "N", "V"), 74_000, 21_000, 6.50),
+    "XPD": ContractSpec("PA", 100.0, ("H", "M", "U", "Z"), 24_500, 6_800, 5.00),
 }
+
+#: Business days before first notice day that the desk treats as the roll window.
+ROLL_WINDOW_BUSINESS_DAYS: int = 6
 
 MONTH_CODE_NAMES: dict[str, str] = {
     "F": "Jan",
@@ -219,6 +228,22 @@ CLIENT_SEGMENT_NAMES: dict[str, str] = {
     "retail_wholesale": "Retail / wholesale",
 }
 
+#: Round-number price increments the desk watches as levels, USD per troy ounce.
+ROUND_LEVEL_STEP_USD_PER_OZ: dict[str, float] = {
+    "XAU": 50.0,
+    "XAG": 1.0,
+    "XPT": 25.0,
+    "XPD": 25.0,
+}
+
+#: Typical client ticket size per metal, in troy ounces.
+AVERAGE_TICKET_SIZE_OZ: dict[str, float] = {
+    "XAU": 3_000.0,
+    "XAG": 100_000.0,
+    "XPT": 1_500.0,
+    "XPD": 800.0,
+}
+
 #: Rough daily client turnover per metal in troy ounces, used to scale flows.
 DAILY_CLIENT_TURNOVER_OZ: dict[str, float] = {
     "XAU": 420_000.0,
@@ -227,9 +252,49 @@ DAILY_CLIENT_TURNOVER_OZ: dict[str, float] = {
     "XPD": 55_000.0,
 }
 
+#: Share of each client segment in a metal's client turnover. Rows sum to 1.0.
+CLIENT_SEGMENT_WEIGHTS: dict[str, dict[str, float]] = {
+    "XAU": {
+        "central_bank": 0.18,
+        "producer_hedger": 0.06,
+        "refiner": 0.08,
+        "investment_asset_manager": 0.24,
+        "industrial": 0.03,
+        "hedge_fund_cta": 0.26,
+        "retail_wholesale": 0.15,
+    },
+    "XAG": {
+        "central_bank": 0.00,
+        "producer_hedger": 0.10,
+        "refiner": 0.12,
+        "investment_asset_manager": 0.18,
+        "industrial": 0.22,
+        "hedge_fund_cta": 0.23,
+        "retail_wholesale": 0.15,
+    },
+    "XPT": {
+        "central_bank": 0.00,
+        "producer_hedger": 0.22,
+        "refiner": 0.14,
+        "investment_asset_manager": 0.14,
+        "industrial": 0.28,
+        "hedge_fund_cta": 0.16,
+        "retail_wholesale": 0.06,
+    },
+    "XPD": {
+        "central_bank": 0.00,
+        "producer_hedger": 0.20,
+        "refiner": 0.16,
+        "investment_asset_manager": 0.10,
+        "industrial": 0.38,
+        "hedge_fund_cta": 0.12,
+        "retail_wholesale": 0.04,
+    },
+}
+
 #: Desk risk limits in USD, keyed by limit name, used for utilisation lines.
 RISK_LIMITS_USD: dict[str, float] = {
-    "Desk VaR (1d, 99%)": 6_000_000.0,
+    "Desk VaR (1d, 99%)": 14_000_000.0,
     "Gold delta notional": 320_000_000.0,
     "Silver delta notional": 120_000_000.0,
     "PGM delta notional": 85_000_000.0,
@@ -239,12 +304,64 @@ RISK_LIMITS_USD: dict[str, float] = {
 #: Utilisation at or above this percentage raises a flag in the risk section.
 LIMIT_WARNING_PCT: float = 80.0
 
+#: Fraction of a delta limit the desk typically runs, used to scale positions
+#: so that fabricated limit utilisation lands in a plausible band.
+POSITION_LIMIT_USAGE_RANGE: tuple[float, float] = (0.30, 0.86)
+
+#: Confidence multiple for a 99% one-tailed VaR, and sessions in a trading year.
+VAR_Z_99: float = 2.326
+TRADING_DAYS_PER_YEAR: int = 252
+
+#: Average pairwise correlation assumed between metals when diversifying VaR.
+VAR_CROSS_METAL_CORRELATION: float = 0.60
+
 # ---------------------------------------------------------------------------
 # Physical market venues
 # ---------------------------------------------------------------------------
 
 #: Loco premium locations quoted in USD per troy ounce vs loco London.
 PREMIUM_LOCATIONS: tuple[str, ...] = ("Zurich", "Dubai", "Singapore", "Hong Kong")
+
+#: Typical loco premium over London, USD per troy ounce, by location and metal.
+LOCO_PREMIUM_ANCHORS_USD_PER_OZ: dict[str, dict[str, float]] = {
+    "Zurich": {"XAU": 0.35, "XAG": 0.02, "XPT": 1.50, "XPD": 1.75},
+    "Dubai": {"XAU": 1.10, "XAG": 0.06, "XPT": 2.25, "XPD": 2.50},
+    "Singapore": {"XAU": 1.60, "XAG": 0.09, "XPT": 3.00, "XPD": 3.25},
+    "Hong Kong": {"XAU": 2.10, "XAG": 0.11, "XPT": 4.00, "XPD": 4.50},
+}
+
+#: COMEX depository anchors in troy ounces: (registered, eligible).
+COMEX_STOCK_ANCHORS_OZ: dict[str, tuple[float, float]] = {
+    "XAU": (18_400_000.0, 17_100_000.0),
+    "XAG": (168_000_000.0, 335_000_000.0),
+    "XPT": (285_000.0, 640_000.0),
+    "XPD": (58_000.0, 82_000.0),
+}
+
+#: LBMA London vaulted holdings anchors, in metric tonnes.
+LBMA_VAULT_ANCHOR_TONNES: dict[str, float] = {
+    "XAU": 8_850.0,
+    "XAG": 24_600.0,
+    "XPT": 195.0,
+    "XPD": 38.0,
+}
+
+#: Shanghai Gold Exchange weekly withdrawal anchors, in metric tonnes.
+SGE_WITHDRAWAL_ANCHOR_TONNES: dict[str, float] = {"XAU": 27.0, "XAG": 320.0}
+
+#: Shanghai premium over loco London anchors, in USD per troy ounce.
+SGE_PREMIUM_ANCHOR_USD_PER_OZ: dict[str, float] = {"XAU": 9.0, "XAG": 0.35}
+
+#: SGE withdrawal reporting period, in days.
+SGE_WITHDRAWAL_PERIOD_DAYS: int = 7
+
+#: Lease rate anchors in annualised percent: (1-month, 3-month).
+LEASE_RATE_ANCHORS_PCT: dict[str, tuple[float, float]] = {
+    "XAU": (1.05, 1.35),
+    "XAG": (1.90, 2.20),
+    "XPT": (3.40, 3.10),
+    "XPD": (4.60, 4.10),
+}
 
 # ---------------------------------------------------------------------------
 # Determinism
@@ -255,7 +372,70 @@ PREMIUM_LOCATIONS: tuple[str, ...] = ("Zurich", "Dubai", "Singapore", "Hong Kong
 MOCK_SEED_SALT: int = 20_260_101
 
 #: Sessions of fabricated price history handed to the technicals section.
-PRICE_HISTORY_SESSIONS: int = 180
+#: Must exceed 200 so the 200-day moving average is genuinely computable.
+PRICE_HISTORY_SESSIONS: int = 260
+
+# ---------------------------------------------------------------------------
+# Look-ahead calendar
+# ---------------------------------------------------------------------------
+
+#: Fabricated economic and central bank calendar entries the mock provider
+#: draws from. Tuple layout:
+#: (event_name, region, time_london_hh_mm, importance, consensus, previous)
+CALENDAR_TEMPLATES: tuple[tuple[str, str, str, str, str | None, str | None], ...] = (
+    ("US CPI (m/m)", "US", "13:30", "high", "+0.2%", "+0.3%"),
+    ("US core PCE (m/m)", "US", "13:30", "high", "+0.2%", "+0.2%"),
+    ("US non-farm payrolls", "US", "13:30", "high", "+145k", "+119k"),
+    ("US initial jobless claims", "US", "13:30", "medium", "228k", "233k"),
+    ("US retail sales (m/m)", "US", "13:30", "medium", "+0.3%", "+0.5%"),
+    ("US PPI (m/m)", "US", "13:30", "medium", "+0.2%", "+0.1%"),
+    ("ISM manufacturing PMI", "US", "15:00", "medium", "49.4", "48.9"),
+    ("US 10y Treasury auction", "US", "18:00", "low", None, "4.21% stop"),
+    ("Euro area flash CPI (y/y)", "Euro area", "10:00", "medium", "+2.1%", "+2.2%"),
+    ("UK labour market report", "UK", "07:00", "medium", "4.4% u/e", "4.4% u/e"),
+    ("China official manufacturing PMI", "China", "02:30", "medium", "49.8", "49.6"),
+    ("China trade balance", "China", "04:00", "low", "$92.0bn", "$98.2bn"),
+    ("India festival demand survey", "India", "11:00", "low", None, None),
+    ("FOMC rate decision", "US", "19:00", "high", "no change", "no change"),
+    ("FOMC minutes", "US", "19:00", "medium", None, None),
+    ("Fed chair testimony", "US", "15:00", "medium", None, None),
+    ("ECB rate decision", "Euro area", "13:15", "high", "no change", "no change"),
+    ("Bank of England rate decision", "UK", "12:00", "high", "no change", "-25bp"),
+    ("PBoC monthly LPR fixing", "China", "01:15", "low", "no change", "no change"),
+)
+
+#: Calendar entries treated as central bank rather than economic releases.
+CENTRAL_BANK_EVENT_NAMES: frozenset[str] = frozenset(
+    {
+        "FOMC rate decision",
+        "FOMC minutes",
+        "Fed chair testimony",
+        "ECB rate decision",
+        "Bank of England rate decision",
+        "PBoC monthly LPR fixing",
+    }
+)
+
+#: Fabricated market holidays affecting London, New York or Shanghai liquidity.
+#: Tuple layout: (month, day, region, holiday_name). Year-agnostic on purpose —
+#: the prototype does not model the moveable feasts.
+MARKET_HOLIDAYS: tuple[tuple[int, int, str, str], ...] = (
+    (1, 1, "London / New York / Shanghai", "New Year's Day"),
+    (1, 19, "New York", "Martin Luther King Jr. Day"),
+    (2, 17, "Shanghai", "Lunar New Year (week-long closure begins)"),
+    (5, 4, "London", "Early May bank holiday"),
+    (5, 25, "London / New York", "Spring bank holiday / Memorial Day"),
+    (7, 3, "New York", "Independence Day (observed)"),
+    (8, 31, "London", "Summer bank holiday"),
+    (9, 7, "New York", "Labor Day"),
+    (10, 1, "Shanghai", "National Day (Golden Week begins)"),
+    (11, 26, "New York", "Thanksgiving"),
+    (12, 25, "London / New York", "Christmas Day"),
+    (12, 26, "London", "Boxing Day"),
+)
+
+#: How far ahead the look-ahead section scans for holidays, in calendar days.
+HOLIDAY_LOOKAHEAD_DAYS: int = 21
 
 # ---------------------------------------------------------------------------
 # Presentation

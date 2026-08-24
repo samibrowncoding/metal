@@ -1,0 +1,59 @@
+{
+  "$defs": {
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "First notice, expiry and roll window for one COMEX contract.",
+  "properties": {
+    "metal": {
+      "$ref": "#/$defs/Metal"
+    },
+    "contract_code": {
+      "description": "Full contract code, e.g. \"GCZ6\".",
+      "title": "Contract Code",
+      "type": "string"
+    },
+    "first_notice_date": {
+      "description": "COMEX first notice day for the delivery month.",
+      "format": "date",
+      "title": "First Notice Date",
+      "type": "string"
+    },
+    "last_trade_date": {
+      "description": "Final trading day of the contract.",
+      "format": "date",
+      "title": "Last Trade Date",
+      "type": "string"
+    },
+    "roll_window_start_date": {
+      "format": "date",
+      "title": "Roll Window Start Date",
+      "type": "string"
+    },
+    "roll_window_end_date": {
+      "format": "date",
+      "title": "Roll Window End Date",
+      "type": "string"
+    }
+  },
+  "required": [
+    "metal",
+    "contract_code",
+    "first_notice_date",
+    "last_trade_date",
+    "roll_window_start_date",
+    "roll_window_end_date"
+  ],
+  "title": "ContractRollWindow",
+  "type": "object"
+}

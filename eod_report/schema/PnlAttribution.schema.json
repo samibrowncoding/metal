@@ -1,0 +1,46 @@
+{
+  "additionalProperties": false,
+  "description": "Daily P&L split by driver. Components sum to total_usd.",
+  "properties": {
+    "spot_usd": {
+      "description": "P&L from outright spot exposure.",
+      "title": "Spot Usd",
+      "type": "number"
+    },
+    "carry_forward_usd": {
+      "description": "P&L from forwards, leases and financing (carry).",
+      "title": "Carry Forward Usd",
+      "type": "number"
+    },
+    "volatility_usd": {
+      "description": "P&L from the options book's vol exposure.",
+      "title": "Volatility Usd",
+      "type": "number"
+    },
+    "client_flow_usd": {
+      "description": "P&L captured on client spread / franchise.",
+      "title": "Client Flow Usd",
+      "type": "number"
+    },
+    "other_usd": {
+      "description": "Residual: fees, funding adjustments, rounding.",
+      "title": "Other Usd",
+      "type": "number"
+    },
+    "total_usd": {
+      "description": "Sum of the five components; the day's P&L.",
+      "title": "Total Usd",
+      "type": "number"
+    }
+  },
+  "required": [
+    "spot_usd",
+    "carry_forward_usd",
+    "volatility_usd",
+    "client_flow_usd",
+    "other_usd",
+    "total_usd"
+  ],
+  "title": "PnlAttribution",
+  "type": "object"
+}

@@ -1,0 +1,113 @@
+{
+  "$defs": {
+    "EventCategory": {
+      "description": "Kind of calendar entry in the look-ahead section.",
+      "enum": [
+        "economic_release",
+        "central_bank",
+        "comex_first_notice",
+        "contract_expiry",
+        "roll_window",
+        "lbma_auction",
+        "holiday"
+      ],
+      "title": "EventCategory",
+      "type": "string"
+    },
+    "EventImportance": {
+      "description": "Desk's own ranking of how much an event is likely to matter.",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ],
+      "title": "EventImportance",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One dated entry in the forward calendar.",
+  "properties": {
+    "event_date": {
+      "format": "date",
+      "title": "Event Date",
+      "type": "string"
+    },
+    "event_time_london": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Time of day in London as \"HH:MM\" (24h), or null for all-day entries.",
+      "title": "Event Time London"
+    },
+    "category": {
+      "$ref": "#/$defs/EventCategory"
+    },
+    "region": {
+      "description": "Market affected, e.g. \"US\", \"UK\", \"Euro area\", \"China\".",
+      "title": "Region",
+      "type": "string"
+    },
+    "event_name": {
+      "title": "Event Name",
+      "type": "string"
+    },
+    "consensus": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Consensus expectation as displayed text, including its unit; null if none.",
+      "title": "Consensus"
+    },
+    "previous": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Prior reading as displayed text; null if none.",
+      "title": "Previous"
+    },
+    "importance": {
+      "$ref": "#/$defs/EventImportance"
+    },
+    "note": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "description": "Desk note, e.g. which metal is most exposed.",
+      "title": "Note"
+    }
+  },
+  "required": [
+    "event_date",
+    "category",
+    "region",
+    "event_name",
+    "importance"
+  ],
+  "title": "CalendarEvent",
+  "type": "object"
+}

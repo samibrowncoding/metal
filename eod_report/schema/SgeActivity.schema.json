@@ -1,0 +1,53 @@
+{
+  "$defs": {
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Shanghai Gold Exchange withdrawals and the Shanghai premium.",
+  "properties": {
+    "metal": {
+      "$ref": "#/$defs/Metal"
+    },
+    "withdrawals_tonnes": {
+      "description": "Metal withdrawn from SGE vaults over the reporting week, in tonnes.",
+      "minimum": 0,
+      "title": "Withdrawals Tonnes",
+      "type": "number"
+    },
+    "withdrawals_period_days": {
+      "description": "Length of the withdrawal reporting period, in days.",
+      "exclusiveMinimum": 0,
+      "title": "Withdrawals Period Days",
+      "type": "integer"
+    },
+    "premium_usd_per_oz": {
+      "description": "Shanghai price versus loco London in USD per troy ounce; positive is a premium, negative a discount.",
+      "title": "Premium Usd Per Oz",
+      "type": "number"
+    },
+    "premium_pct": {
+      "description": "The same premium as a percent of loco London; signed.",
+      "title": "Premium Pct",
+      "type": "number"
+    }
+  },
+  "required": [
+    "metal",
+    "withdrawals_tonnes",
+    "withdrawals_period_days",
+    "premium_usd_per_oz",
+    "premium_pct"
+  ],
+  "title": "SgeActivity",
+  "type": "object"
+}

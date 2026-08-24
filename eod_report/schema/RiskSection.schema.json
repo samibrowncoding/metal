@@ -1,0 +1,248 @@
+{
+  "$defs": {
+    "DeskPosition": {
+      "additionalProperties": false,
+      "description": "The desk's end-of-session position in one metal.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "position_oz": {
+          "description": "Outright position in troy ounces; positive long, negative short.",
+          "title": "Position Oz",
+          "type": "number"
+        },
+        "delta_equivalent_oz": {
+          "description": "Position including options delta, in troy ounces; positive long. Differs from position_oz by the options book's delta.",
+          "title": "Delta Equivalent Oz",
+          "type": "number"
+        },
+        "usd_notional": {
+          "description": "Delta-equivalent notional in USD; sign matches delta_equivalent_oz.",
+          "title": "Usd Notional",
+          "type": "number"
+        },
+        "var_1d_99_usd": {
+          "description": "Standalone 1-day 99% VaR for this metal, in USD (positive loss).",
+          "minimum": 0,
+          "title": "Var 1D 99 Usd",
+          "type": "number"
+        }
+      },
+      "required": [
+        "metal",
+        "position_oz",
+        "delta_equivalent_oz",
+        "usd_notional",
+        "var_1d_99_usd"
+      ],
+      "title": "DeskPosition",
+      "type": "object"
+    },
+    "LimitUtilisation": {
+      "additionalProperties": false,
+      "description": "Utilisation of one desk risk limit.",
+      "properties": {
+        "limit_name": {
+          "description": "Limit as named in the desk mandate.",
+          "title": "Limit Name",
+          "type": "string"
+        },
+        "limit_usd": {
+          "description": "Approved limit in USD.",
+          "exclusiveMinimum": 0,
+          "title": "Limit Usd",
+          "type": "number"
+        },
+        "utilisation_usd": {
+          "description": "Current usage in USD (absolute exposure against the limit).",
+          "minimum": 0,
+          "title": "Utilisation Usd",
+          "type": "number"
+        },
+        "utilisation_pct": {
+          "description": "utilisation_usd as a percent of limit_usd; 82.5 = 82.5%.",
+          "minimum": 0,
+          "title": "Utilisation Pct",
+          "type": "number"
+        },
+        "above_warning_threshold": {
+          "description": "True when utilisation_pct is at or above the configured warning level (80%).",
+          "title": "Above Warning Threshold",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "limit_name",
+        "limit_usd",
+        "utilisation_usd",
+        "utilisation_pct",
+        "above_warning_threshold"
+      ],
+      "title": "LimitUtilisation",
+      "type": "object"
+    },
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    },
+    "OptionsGreeks": {
+      "additionalProperties": false,
+      "description": "Options book greeks for one metal, expressed per-metal not per-strike.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "delta_oz": {
+          "description": "Options delta in troy ounces; positive long.",
+          "title": "Delta Oz",
+          "type": "number"
+        },
+        "gamma_oz_per_pct": {
+          "description": "Change in delta (troy ounces) for a +1% move in spot.",
+          "title": "Gamma Oz Per Pct",
+          "type": "number"
+        },
+        "vega_usd_per_vol_pt": {
+          "description": "P&L in USD for a +1 volatility point move in implied vol.",
+          "title": "Vega Usd Per Vol Pt",
+          "type": "number"
+        },
+        "theta_usd_per_day": {
+          "description": "Expected P&L in USD from one calendar day of time decay; usually negative when long options.",
+          "title": "Theta Usd Per Day",
+          "type": "number"
+        }
+      },
+      "required": [
+        "metal",
+        "delta_oz",
+        "gamma_oz_per_pct",
+        "vega_usd_per_vol_pt",
+        "theta_usd_per_day"
+      ],
+      "title": "OptionsGreeks",
+      "type": "object"
+    },
+    "PnlAttribution": {
+      "additionalProperties": false,
+      "description": "Daily P&L split by driver. Components sum to total_usd.",
+      "properties": {
+        "spot_usd": {
+          "description": "P&L from outright spot exposure.",
+          "title": "Spot Usd",
+          "type": "number"
+        },
+        "carry_forward_usd": {
+          "description": "P&L from forwards, leases and financing (carry).",
+          "title": "Carry Forward Usd",
+          "type": "number"
+        },
+        "volatility_usd": {
+          "description": "P&L from the options book's vol exposure.",
+          "title": "Volatility Usd",
+          "type": "number"
+        },
+        "client_flow_usd": {
+          "description": "P&L captured on client spread / franchise.",
+          "title": "Client Flow Usd",
+          "type": "number"
+        },
+        "other_usd": {
+          "description": "Residual: fees, funding adjustments, rounding.",
+          "title": "Other Usd",
+          "type": "number"
+        },
+        "total_usd": {
+          "description": "Sum of the five components; the day's P&L.",
+          "title": "Total Usd",
+          "type": "number"
+        }
+      },
+      "required": [
+        "spot_usd",
+        "carry_forward_usd",
+        "volatility_usd",
+        "client_flow_usd",
+        "other_usd",
+        "total_usd"
+      ],
+      "title": "PnlAttribution",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Section 2. Position, P&L, VaR, greeks and limit usage.",
+  "properties": {
+    "positions": {
+      "items": {
+        "$ref": "#/$defs/DeskPosition"
+      },
+      "title": "Positions",
+      "type": "array"
+    },
+    "daily_pnl_usd": {
+      "description": "Session P&L across the desk; positive is profit.",
+      "title": "Daily Pnl Usd",
+      "type": "number"
+    },
+    "mtd_pnl_usd": {
+      "description": "Month-to-date P&L across the desk.",
+      "title": "Mtd Pnl Usd",
+      "type": "number"
+    },
+    "ytd_pnl_usd": {
+      "description": "Year-to-date P&L across the desk.",
+      "title": "Ytd Pnl Usd",
+      "type": "number"
+    },
+    "pnl_attribution": {
+      "$ref": "#/$defs/PnlAttribution"
+    },
+    "desk_var_1d_99_usd": {
+      "description": "Diversified desk-level 1-day 99% VaR in USD (positive loss). Lower than the sum of per-metal VaRs because of correlation benefit.",
+      "minimum": 0,
+      "title": "Desk Var 1D 99 Usd",
+      "type": "number"
+    },
+    "greeks": {
+      "items": {
+        "$ref": "#/$defs/OptionsGreeks"
+      },
+      "title": "Greeks",
+      "type": "array"
+    },
+    "limits": {
+      "items": {
+        "$ref": "#/$defs/LimitUtilisation"
+      },
+      "title": "Limits",
+      "type": "array"
+    },
+    "any_limit_flagged": {
+      "description": "True when at least one limit is at or above the warning threshold.",
+      "title": "Any Limit Flagged",
+      "type": "boolean"
+    }
+  },
+  "required": [
+    "positions",
+    "daily_pnl_usd",
+    "mtd_pnl_usd",
+    "ytd_pnl_usd",
+    "pnl_attribution",
+    "desk_var_1d_99_usd",
+    "greeks",
+    "limits",
+    "any_limit_flagged"
+  ],
+  "title": "RiskSection",
+  "type": "object"
+}

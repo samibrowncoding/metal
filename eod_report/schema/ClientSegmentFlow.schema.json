@@ -1,0 +1,49 @@
+{
+  "$defs": {
+    "ClientSegment": {
+      "description": "Client taxonomy used for the flow breakdown.",
+      "enum": [
+        "central_bank",
+        "producer_hedger",
+        "refiner",
+        "investment_asset_manager",
+        "industrial",
+        "hedge_fund_cta",
+        "retail_wholesale"
+      ],
+      "title": "ClientSegment",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Net client flow for one metal within one client segment.",
+  "properties": {
+    "segment": {
+      "$ref": "#/$defs/ClientSegment"
+    },
+    "net_oz": {
+      "description": "Net troy ounces; positive when the segment bought (desk sold).",
+      "title": "Net Oz",
+      "type": "number"
+    },
+    "net_usd": {
+      "description": "Net USD notional of the same flow; sign matches net_oz.",
+      "title": "Net Usd",
+      "type": "number"
+    },
+    "ticket_count": {
+      "description": "Tickets booked for this segment.",
+      "minimum": 0,
+      "title": "Ticket Count",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "segment",
+    "net_oz",
+    "net_usd",
+    "ticket_count"
+  ],
+  "title": "ClientSegmentFlow",
+  "type": "object"
+}

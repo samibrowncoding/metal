@@ -1,0 +1,42 @@
+{
+  "$defs": {
+    "LevelType": {
+      "description": "Whether a technical level sits below (support) or above (resistance).",
+      "enum": [
+        "support",
+        "resistance"
+      ],
+      "title": "LevelType",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "A single support or resistance level.",
+  "properties": {
+    "level_type": {
+      "$ref": "#/$defs/LevelType"
+    },
+    "price_usd_per_oz": {
+      "title": "Price Usd Per Oz",
+      "type": "number"
+    },
+    "label": {
+      "description": "Short human label, e.g. \"prior range low\", \"38.2% retracement\".",
+      "title": "Label",
+      "type": "string"
+    },
+    "distance_pct": {
+      "description": "Signed distance from the current close to this level, in percent of the close; positive when the level is above the market.",
+      "title": "Distance Pct",
+      "type": "number"
+    }
+  },
+  "required": [
+    "level_type",
+    "price_usd_per_oz",
+    "label",
+    "distance_pct"
+  ],
+  "title": "TechnicalLevel",
+  "type": "object"
+}

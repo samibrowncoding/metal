@@ -1,0 +1,92 @@
+{
+  "$defs": {
+    "Direction": {
+      "description": "Direction of a change, for the coloured up/down indicator.",
+      "enum": [
+        "up",
+        "down",
+        "flat"
+      ],
+      "title": "Direction",
+      "type": "string"
+    },
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One metal's line in the header snapshot strip.\n\nPrices are spot loco London in USD per troy ounce unless stated otherwise.",
+  "properties": {
+    "metal": {
+      "$ref": "#/$defs/Metal"
+    },
+    "close_usd_per_oz": {
+      "description": "Spot close at the London close.",
+      "title": "Close Usd Per Oz",
+      "type": "number"
+    },
+    "prior_close_usd_per_oz": {
+      "description": "Previous session's spot close, the comparison basis.",
+      "title": "Prior Close Usd Per Oz",
+      "type": "number"
+    },
+    "change_usd_per_oz": {
+      "description": "close_usd_per_oz minus prior_close_usd_per_oz; signed.",
+      "title": "Change Usd Per Oz",
+      "type": "number"
+    },
+    "change_pct": {
+      "description": "Session change in percent of prior close; signed, 1.25 = +1.25%.",
+      "title": "Change Pct",
+      "type": "number"
+    },
+    "session_high_usd_per_oz": {
+      "description": "Highest spot print of the session.",
+      "title": "Session High Usd Per Oz",
+      "type": "number"
+    },
+    "session_low_usd_per_oz": {
+      "description": "Lowest spot print of the session.",
+      "title": "Session Low Usd Per Oz",
+      "type": "number"
+    },
+    "lbma_pm_auction_usd_per_oz": {
+      "description": "LBMA PM auction price for the session. For silver, which has a single daily auction, the noon auction price is reported here.",
+      "title": "Lbma Pm Auction Usd Per Oz",
+      "type": "number"
+    },
+    "direction": {
+      "$ref": "#/$defs/Direction",
+      "description": "Sign of change_usd_per_oz, driving the coloured indicator."
+    },
+    "price_decimals": {
+      "description": "Decimal places this instrument is quoted to, for display consistency.",
+      "maximum": 4,
+      "minimum": 0,
+      "title": "Price Decimals",
+      "type": "integer"
+    }
+  },
+  "required": [
+    "metal",
+    "close_usd_per_oz",
+    "prior_close_usd_per_oz",
+    "change_usd_per_oz",
+    "change_pct",
+    "session_high_usd_per_oz",
+    "session_low_usd_per_oz",
+    "lbma_pm_auction_usd_per_oz",
+    "direction",
+    "price_decimals"
+  ],
+  "title": "MetalSnapshot",
+  "type": "object"
+}

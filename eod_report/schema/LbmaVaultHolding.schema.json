@@ -1,0 +1,53 @@
+{
+  "$defs": {
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "LBMA London vaulted holdings for one metal.\n\nLBMA publishes vault holdings **monthly**, around the twentieth of the\nfollowing month, so this is the most recent month-end rather than today.",
+  "properties": {
+    "metal": {
+      "$ref": "#/$defs/Metal"
+    },
+    "holdings_tonnes": {
+      "description": "Vaulted metal in London, in tonnes.",
+      "minimum": 0,
+      "title": "Holdings Tonnes",
+      "type": "number"
+    },
+    "month_change_tonnes": {
+      "description": "Change vs the prior published month, in tonnes; signed.",
+      "title": "Month Change Tonnes",
+      "type": "number"
+    },
+    "month_change_pct": {
+      "description": "The same change in percent; signed.",
+      "title": "Month Change Pct",
+      "type": "number"
+    },
+    "as_of_month_end": {
+      "description": "Month-end the holdings refer to.",
+      "format": "date",
+      "title": "As Of Month End",
+      "type": "string"
+    }
+  },
+  "required": [
+    "metal",
+    "holdings_tonnes",
+    "month_change_tonnes",
+    "month_change_pct",
+    "as_of_month_end"
+  ],
+  "title": "LbmaVaultHolding",
+  "type": "object"
+}

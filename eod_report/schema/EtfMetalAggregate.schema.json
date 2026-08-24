@@ -1,0 +1,64 @@
+{
+  "$defs": {
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "All tracked funds in one metal, summed.",
+  "properties": {
+    "metal": {
+      "$ref": "#/$defs/Metal"
+    },
+    "holdings_tonnes": {
+      "minimum": 0,
+      "title": "Holdings Tonnes",
+      "type": "number"
+    },
+    "daily_change_tonnes": {
+      "title": "Daily Change Tonnes",
+      "type": "number"
+    },
+    "daily_change_usd": {
+      "title": "Daily Change Usd",
+      "type": "number"
+    },
+    "wtd_flow_tonnes": {
+      "title": "Wtd Flow Tonnes",
+      "type": "number"
+    },
+    "mtd_flow_tonnes": {
+      "title": "Mtd Flow Tonnes",
+      "type": "number"
+    },
+    "ytd_flow_tonnes": {
+      "title": "Ytd Flow Tonnes",
+      "type": "number"
+    },
+    "aum_usd": {
+      "minimum": 0,
+      "title": "Aum Usd",
+      "type": "number"
+    }
+  },
+  "required": [
+    "metal",
+    "holdings_tonnes",
+    "daily_change_tonnes",
+    "daily_change_usd",
+    "wtd_flow_tonnes",
+    "mtd_flow_tonnes",
+    "ytd_flow_tonnes",
+    "aum_usd"
+  ],
+  "title": "EtfMetalAggregate",
+  "type": "object"
+}

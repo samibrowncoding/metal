@@ -1,0 +1,52 @@
+{
+  "$defs": {
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "The desk's end-of-session position in one metal.",
+  "properties": {
+    "metal": {
+      "$ref": "#/$defs/Metal"
+    },
+    "position_oz": {
+      "description": "Outright position in troy ounces; positive long, negative short.",
+      "title": "Position Oz",
+      "type": "number"
+    },
+    "delta_equivalent_oz": {
+      "description": "Position including options delta, in troy ounces; positive long. Differs from position_oz by the options book's delta.",
+      "title": "Delta Equivalent Oz",
+      "type": "number"
+    },
+    "usd_notional": {
+      "description": "Delta-equivalent notional in USD; sign matches delta_equivalent_oz.",
+      "title": "Usd Notional",
+      "type": "number"
+    },
+    "var_1d_99_usd": {
+      "description": "Standalone 1-day 99% VaR for this metal, in USD (positive loss).",
+      "minimum": 0,
+      "title": "Var 1D 99 Usd",
+      "type": "number"
+    }
+  },
+  "required": [
+    "metal",
+    "position_oz",
+    "delta_equivalent_oz",
+    "usd_notional",
+    "var_1d_99_usd"
+  ],
+  "title": "DeskPosition",
+  "type": "object"
+}

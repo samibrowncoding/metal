@@ -1,0 +1,1681 @@
+{
+  "$defs": {
+    "CalendarEvent": {
+      "additionalProperties": false,
+      "description": "One dated entry in the forward calendar.",
+      "properties": {
+        "event_date": {
+          "format": "date",
+          "title": "Event Date",
+          "type": "string"
+        },
+        "event_time_london": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Time of day in London as \"HH:MM\" (24h), or null for all-day entries.",
+          "title": "Event Time London"
+        },
+        "category": {
+          "$ref": "#/$defs/EventCategory"
+        },
+        "region": {
+          "description": "Market affected, e.g. \"US\", \"UK\", \"Euro area\", \"China\".",
+          "title": "Region",
+          "type": "string"
+        },
+        "event_name": {
+          "title": "Event Name",
+          "type": "string"
+        },
+        "consensus": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Consensus expectation as displayed text, including its unit; null if none.",
+          "title": "Consensus"
+        },
+        "previous": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Prior reading as displayed text; null if none.",
+          "title": "Previous"
+        },
+        "importance": {
+          "$ref": "#/$defs/EventImportance"
+        },
+        "note": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "description": "Desk note, e.g. which metal is most exposed.",
+          "title": "Note"
+        }
+      },
+      "required": [
+        "event_date",
+        "category",
+        "region",
+        "event_name",
+        "importance"
+      ],
+      "title": "CalendarEvent",
+      "type": "object"
+    },
+    "ClientFlowsSection": {
+      "additionalProperties": false,
+      "description": "Section 1. Desk-facing client flow, net of internal transfers.",
+      "properties": {
+        "metals": {
+          "items": {
+            "$ref": "#/$defs/MetalClientFlow"
+          },
+          "title": "Metals",
+          "type": "array"
+        },
+        "total_ticket_count": {
+          "description": "Tickets across all metals.",
+          "minimum": 0,
+          "title": "Total Ticket Count",
+          "type": "integer"
+        },
+        "total_gross_usd": {
+          "description": "Gross USD notional traded with clients across all metals.",
+          "minimum": 0,
+          "title": "Total Gross Usd",
+          "type": "number"
+        }
+      },
+      "required": [
+        "metals",
+        "total_ticket_count",
+        "total_gross_usd"
+      ],
+      "title": "ClientFlowsSection",
+      "type": "object"
+    },
+    "ClientSegment": {
+      "description": "Client taxonomy used for the flow breakdown.",
+      "enum": [
+        "central_bank",
+        "producer_hedger",
+        "refiner",
+        "investment_asset_manager",
+        "industrial",
+        "hedge_fund_cta",
+        "retail_wholesale"
+      ],
+      "title": "ClientSegment",
+      "type": "string"
+    },
+    "ClientSegmentFlow": {
+      "additionalProperties": false,
+      "description": "Net client flow for one metal within one client segment.",
+      "properties": {
+        "segment": {
+          "$ref": "#/$defs/ClientSegment"
+        },
+        "net_oz": {
+          "description": "Net troy ounces; positive when the segment bought (desk sold).",
+          "title": "Net Oz",
+          "type": "number"
+        },
+        "net_usd": {
+          "description": "Net USD notional of the same flow; sign matches net_oz.",
+          "title": "Net Usd",
+          "type": "number"
+        },
+        "ticket_count": {
+          "description": "Tickets booked for this segment.",
+          "minimum": 0,
+          "title": "Ticket Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "segment",
+        "net_oz",
+        "net_usd",
+        "ticket_count"
+      ],
+      "title": "ClientSegmentFlow",
+      "type": "object"
+    },
+    "ComexContractActivity": {
+      "additionalProperties": false,
+      "description": "Open interest and volume for one COMEX contract.",
+      "properties": {
+        "contract_code": {
+          "description": "Exchange root, e.g. \"GC\", \"SI\", \"PL\", \"PA\".",
+          "title": "Contract Code",
+          "type": "string"
+        },
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "contract_size_oz": {
+          "description": "Troy ounces per contract.",
+          "exclusiveMinimum": 0,
+          "title": "Contract Size Oz",
+          "type": "number"
+        },
+        "open_interest_lots": {
+          "description": "Total open interest in contracts.",
+          "minimum": 0,
+          "title": "Open Interest Lots",
+          "type": "integer"
+        },
+        "open_interest_change_lots": {
+          "description": "Day-on-day change in open interest, in contracts; signed.",
+          "title": "Open Interest Change Lots",
+          "type": "integer"
+        },
+        "session_volume_lots": {
+          "description": "Session volume in contracts.",
+          "minimum": 0,
+          "title": "Session Volume Lots",
+          "type": "integer"
+        },
+        "volume_20d_average_lots": {
+          "description": "Trailing 20-session average volume in contracts.",
+          "minimum": 0,
+          "title": "Volume 20D Average Lots",
+          "type": "integer"
+        },
+        "volume_vs_20d_average_pct": {
+          "description": "Session volume as a percent deviation from the 20-day average; signed.",
+          "title": "Volume Vs 20D Average Pct",
+          "type": "number"
+        },
+        "front_month_code": {
+          "description": "Front month, e.g. \"GCZ6\".",
+          "title": "Front Month Code",
+          "type": "string"
+        },
+        "front_month_expiry_date": {
+          "format": "date",
+          "title": "Front Month Expiry Date",
+          "type": "string"
+        },
+        "next_active_month_code": {
+          "description": "Next active delivery month code.",
+          "title": "Next Active Month Code",
+          "type": "string"
+        },
+        "next_active_expiry_date": {
+          "format": "date",
+          "title": "Next Active Expiry Date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "contract_code",
+        "metal",
+        "contract_size_oz",
+        "open_interest_lots",
+        "open_interest_change_lots",
+        "session_volume_lots",
+        "volume_20d_average_lots",
+        "volume_vs_20d_average_pct",
+        "front_month_code",
+        "front_month_expiry_date",
+        "next_active_month_code",
+        "next_active_expiry_date"
+      ],
+      "title": "ComexContractActivity",
+      "type": "object"
+    },
+    "ComexStocks": {
+      "additionalProperties": false,
+      "description": "COMEX depository stocks for one metal, in troy ounces.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "registered_oz": {
+          "description": "Registered (deliverable) stocks.",
+          "minimum": 0,
+          "title": "Registered Oz",
+          "type": "number"
+        },
+        "eligible_oz": {
+          "description": "Eligible (warranted but not offered) stocks.",
+          "minimum": 0,
+          "title": "Eligible Oz",
+          "type": "number"
+        },
+        "total_oz": {
+          "description": "registered_oz plus eligible_oz.",
+          "minimum": 0,
+          "title": "Total Oz",
+          "type": "number"
+        },
+        "registered_change_oz": {
+          "description": "Day-on-day change in registered stocks; positive is metal in.",
+          "title": "Registered Change Oz",
+          "type": "number"
+        },
+        "eligible_change_oz": {
+          "description": "Day-on-day change in eligible stocks; positive is metal in.",
+          "title": "Eligible Change Oz",
+          "type": "number"
+        },
+        "total_change_oz": {
+          "description": "Day-on-day change in total stocks; signed.",
+          "title": "Total Change Oz",
+          "type": "number"
+        }
+      },
+      "required": [
+        "metal",
+        "registered_oz",
+        "eligible_oz",
+        "total_oz",
+        "registered_change_oz",
+        "eligible_change_oz",
+        "total_change_oz"
+      ],
+      "title": "ComexStocks",
+      "type": "object"
+    },
+    "ContractRollWindow": {
+      "additionalProperties": false,
+      "description": "First notice, expiry and roll window for one COMEX contract.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "contract_code": {
+          "description": "Full contract code, e.g. \"GCZ6\".",
+          "title": "Contract Code",
+          "type": "string"
+        },
+        "first_notice_date": {
+          "description": "COMEX first notice day for the delivery month.",
+          "format": "date",
+          "title": "First Notice Date",
+          "type": "string"
+        },
+        "last_trade_date": {
+          "description": "Final trading day of the contract.",
+          "format": "date",
+          "title": "Last Trade Date",
+          "type": "string"
+        },
+        "roll_window_start_date": {
+          "format": "date",
+          "title": "Roll Window Start Date",
+          "type": "string"
+        },
+        "roll_window_end_date": {
+          "format": "date",
+          "title": "Roll Window End Date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "metal",
+        "contract_code",
+        "first_notice_date",
+        "last_trade_date",
+        "roll_window_start_date",
+        "roll_window_end_date"
+      ],
+      "title": "ContractRollWindow",
+      "type": "object"
+    },
+    "CotManagedMoney": {
+      "additionalProperties": false,
+      "description": "Managed money positioning from the CFTC Commitments of Traders report.\n\nThe COT lags: it is surveyed on a Tuesday and published the following\nFriday afternoon, so ``report_date`` is always earlier than the report date\nand must be shown to the reader.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "report_date": {
+          "description": "Tuesday the COT position was surveyed.",
+          "format": "date",
+          "title": "Report Date",
+          "type": "string"
+        },
+        "published_date": {
+          "description": "Friday the report was released by the CFTC.",
+          "format": "date",
+          "title": "Published Date",
+          "type": "string"
+        },
+        "managed_money_long_lots": {
+          "minimum": 0,
+          "title": "Managed Money Long Lots",
+          "type": "integer"
+        },
+        "managed_money_short_lots": {
+          "minimum": 0,
+          "title": "Managed Money Short Lots",
+          "type": "integer"
+        },
+        "managed_money_net_lots": {
+          "description": "Long minus short, in contracts; signed.",
+          "title": "Managed Money Net Lots",
+          "type": "integer"
+        },
+        "net_change_wow_lots": {
+          "description": "Week-on-week change in the net position, in contracts; signed.",
+          "title": "Net Change Wow Lots",
+          "type": "integer"
+        },
+        "net_oz": {
+          "description": "Net position converted to troy ounces using contract_size_oz.",
+          "title": "Net Oz",
+          "type": "number"
+        }
+      },
+      "required": [
+        "metal",
+        "report_date",
+        "published_date",
+        "managed_money_long_lots",
+        "managed_money_short_lots",
+        "managed_money_net_lots",
+        "net_change_wow_lots",
+        "net_oz"
+      ],
+      "title": "CotManagedMoney",
+      "type": "object"
+    },
+    "DeskPosition": {
+      "additionalProperties": false,
+      "description": "The desk's end-of-session position in one metal.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "position_oz": {
+          "description": "Outright position in troy ounces; positive long, negative short.",
+          "title": "Position Oz",
+          "type": "number"
+        },
+        "delta_equivalent_oz": {
+          "description": "Position including options delta, in troy ounces; positive long. Differs from position_oz by the options book's delta.",
+          "title": "Delta Equivalent Oz",
+          "type": "number"
+        },
+        "usd_notional": {
+          "description": "Delta-equivalent notional in USD; sign matches delta_equivalent_oz.",
+          "title": "Usd Notional",
+          "type": "number"
+        },
+        "var_1d_99_usd": {
+          "description": "Standalone 1-day 99% VaR for this metal, in USD (positive loss).",
+          "minimum": 0,
+          "title": "Var 1D 99 Usd",
+          "type": "number"
+        }
+      },
+      "required": [
+        "metal",
+        "position_oz",
+        "delta_equivalent_oz",
+        "usd_notional",
+        "var_1d_99_usd"
+      ],
+      "title": "DeskPosition",
+      "type": "object"
+    },
+    "Direction": {
+      "description": "Direction of a change, for the coloured up/down indicator.",
+      "enum": [
+        "up",
+        "down",
+        "flat"
+      ],
+      "title": "Direction",
+      "type": "string"
+    },
+    "EfpLevel": {
+      "additionalProperties": false,
+      "description": "Exchange for physical level for one metal, USD per troy ounce.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "efp_usd_per_oz": {
+          "description": "Front-month EFP: futures minus loco London spot; signed.",
+          "title": "Efp Usd Per Oz",
+          "type": "number"
+        },
+        "recent_range_low_usd_per_oz": {
+          "description": "Low of the trailing 20-session EFP range.",
+          "title": "Recent Range Low Usd Per Oz",
+          "type": "number"
+        },
+        "recent_range_high_usd_per_oz": {
+          "description": "High of the trailing 20-session EFP range.",
+          "title": "Recent Range High Usd Per Oz",
+          "type": "number"
+        },
+        "outside_recent_range": {
+          "description": "True when efp_usd_per_oz sits outside the trailing range \u2014 a dislocation flag.",
+          "title": "Outside Recent Range",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "metal",
+        "efp_usd_per_oz",
+        "recent_range_low_usd_per_oz",
+        "recent_range_high_usd_per_oz",
+        "outside_recent_range"
+      ],
+      "title": "EfpLevel",
+      "type": "object"
+    },
+    "EtfFundFlow": {
+      "additionalProperties": false,
+      "description": "Holdings and flows for one exchange traded product.\n\nIn production these figures are **T+1**: issuers publish the prior day's\nholdings in the morning, so the line reported at today's London close is\nyesterday's bar. ``as_of_date`` on the section states the effective date.",
+      "properties": {
+        "ticker": {
+          "description": "Listing ticker, or \"OTHER\" for the aggregate line.",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "fund_name": {
+          "title": "Fund Name",
+          "type": "string"
+        },
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "holdings_tonnes": {
+          "description": "Total metal held, in metric tonnes.",
+          "minimum": 0,
+          "title": "Holdings Tonnes",
+          "type": "number"
+        },
+        "daily_change_tonnes": {
+          "description": "Change in holdings vs the prior report, in tonnes; positive is a creation.",
+          "title": "Daily Change Tonnes",
+          "type": "number"
+        },
+        "daily_change_usd": {
+          "description": "Daily change valued at the session close, in USD; sign matches tonnes.",
+          "title": "Daily Change Usd",
+          "type": "number"
+        },
+        "aum_usd": {
+          "description": "Assets under management in USD.",
+          "minimum": 0,
+          "title": "Aum Usd",
+          "type": "number"
+        },
+        "wtd_flow_tonnes": {
+          "description": "Week-to-date cumulative flow in tonnes; signed.",
+          "title": "Wtd Flow Tonnes",
+          "type": "number"
+        },
+        "mtd_flow_tonnes": {
+          "description": "Month-to-date cumulative flow in tonnes; signed.",
+          "title": "Mtd Flow Tonnes",
+          "type": "number"
+        },
+        "ytd_flow_tonnes": {
+          "description": "Year-to-date cumulative flow in tonnes; signed.",
+          "title": "Ytd Flow Tonnes",
+          "type": "number"
+        },
+        "ytd_flow_usd": {
+          "description": "Year-to-date cumulative flow valued in USD; signed.",
+          "title": "Ytd Flow Usd",
+          "type": "number"
+        }
+      },
+      "required": [
+        "ticker",
+        "fund_name",
+        "metal",
+        "holdings_tonnes",
+        "daily_change_tonnes",
+        "daily_change_usd",
+        "aum_usd",
+        "wtd_flow_tonnes",
+        "mtd_flow_tonnes",
+        "ytd_flow_tonnes",
+        "ytd_flow_usd"
+      ],
+      "title": "EtfFundFlow",
+      "type": "object"
+    },
+    "EtfMetalAggregate": {
+      "additionalProperties": false,
+      "description": "All tracked funds in one metal, summed.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "holdings_tonnes": {
+          "minimum": 0,
+          "title": "Holdings Tonnes",
+          "type": "number"
+        },
+        "daily_change_tonnes": {
+          "title": "Daily Change Tonnes",
+          "type": "number"
+        },
+        "daily_change_usd": {
+          "title": "Daily Change Usd",
+          "type": "number"
+        },
+        "wtd_flow_tonnes": {
+          "title": "Wtd Flow Tonnes",
+          "type": "number"
+        },
+        "mtd_flow_tonnes": {
+          "title": "Mtd Flow Tonnes",
+          "type": "number"
+        },
+        "ytd_flow_tonnes": {
+          "title": "Ytd Flow Tonnes",
+          "type": "number"
+        },
+        "aum_usd": {
+          "minimum": 0,
+          "title": "Aum Usd",
+          "type": "number"
+        }
+      },
+      "required": [
+        "metal",
+        "holdings_tonnes",
+        "daily_change_tonnes",
+        "daily_change_usd",
+        "wtd_flow_tonnes",
+        "mtd_flow_tonnes",
+        "ytd_flow_tonnes",
+        "aum_usd"
+      ],
+      "title": "EtfMetalAggregate",
+      "type": "object"
+    },
+    "EtfSection": {
+      "additionalProperties": false,
+      "description": "Section 4. Physically backed ETF holdings and flows.\n\nReported holdings lag the market by one business day (T+1) in reality; the\nprototype fabricates the T+1 figure and stamps ``as_of_date`` accordingly.",
+      "properties": {
+        "as_of_date": {
+          "description": "Effective date of the holdings figures (report date minus one session).",
+          "format": "date",
+          "title": "As Of Date",
+          "type": "string"
+        },
+        "reporting_lag_note": {
+          "description": "Human-readable note explaining the T+1 reporting lag.",
+          "title": "Reporting Lag Note",
+          "type": "string"
+        },
+        "funds": {
+          "items": {
+            "$ref": "#/$defs/EtfFundFlow"
+          },
+          "title": "Funds",
+          "type": "array"
+        },
+        "metal_aggregates": {
+          "items": {
+            "$ref": "#/$defs/EtfMetalAggregate"
+          },
+          "title": "Metal Aggregates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "as_of_date",
+        "reporting_lag_note",
+        "funds",
+        "metal_aggregates"
+      ],
+      "title": "EtfSection",
+      "type": "object"
+    },
+    "EventCategory": {
+      "description": "Kind of calendar entry in the look-ahead section.",
+      "enum": [
+        "economic_release",
+        "central_bank",
+        "comex_first_notice",
+        "contract_expiry",
+        "roll_window",
+        "lbma_auction",
+        "holiday"
+      ],
+      "title": "EventCategory",
+      "type": "string"
+    },
+    "EventImportance": {
+      "description": "Desk's own ranking of how much an event is likely to matter.",
+      "enum": [
+        "high",
+        "medium",
+        "low"
+      ],
+      "title": "EventImportance",
+      "type": "string"
+    },
+    "LbmaVaultHolding": {
+      "additionalProperties": false,
+      "description": "LBMA London vaulted holdings for one metal.\n\nLBMA publishes vault holdings **monthly**, around the twentieth of the\nfollowing month, so this is the most recent month-end rather than today.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "holdings_tonnes": {
+          "description": "Vaulted metal in London, in tonnes.",
+          "minimum": 0,
+          "title": "Holdings Tonnes",
+          "type": "number"
+        },
+        "month_change_tonnes": {
+          "description": "Change vs the prior published month, in tonnes; signed.",
+          "title": "Month Change Tonnes",
+          "type": "number"
+        },
+        "month_change_pct": {
+          "description": "The same change in percent; signed.",
+          "title": "Month Change Pct",
+          "type": "number"
+        },
+        "as_of_month_end": {
+          "description": "Month-end the holdings refer to.",
+          "format": "date",
+          "title": "As Of Month End",
+          "type": "string"
+        }
+      },
+      "required": [
+        "metal",
+        "holdings_tonnes",
+        "month_change_tonnes",
+        "month_change_pct",
+        "as_of_month_end"
+      ],
+      "title": "LbmaVaultHolding",
+      "type": "object"
+    },
+    "LeaseRate": {
+      "additionalProperties": false,
+      "description": "Metal lease rates for one metal, annualised percent.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "lease_rate_1m_pct": {
+          "description": "1-month lease rate, annualised percent.",
+          "title": "Lease Rate 1M Pct",
+          "type": "number"
+        },
+        "lease_rate_3m_pct": {
+          "description": "3-month lease rate, annualised percent.",
+          "title": "Lease Rate 3M Pct",
+          "type": "number"
+        }
+      },
+      "required": [
+        "metal",
+        "lease_rate_1m_pct",
+        "lease_rate_3m_pct"
+      ],
+      "title": "LeaseRate",
+      "type": "object"
+    },
+    "LevelType": {
+      "description": "Whether a technical level sits below (support) or above (resistance).",
+      "enum": [
+        "support",
+        "resistance"
+      ],
+      "title": "LevelType",
+      "type": "string"
+    },
+    "LimitUtilisation": {
+      "additionalProperties": false,
+      "description": "Utilisation of one desk risk limit.",
+      "properties": {
+        "limit_name": {
+          "description": "Limit as named in the desk mandate.",
+          "title": "Limit Name",
+          "type": "string"
+        },
+        "limit_usd": {
+          "description": "Approved limit in USD.",
+          "exclusiveMinimum": 0,
+          "title": "Limit Usd",
+          "type": "number"
+        },
+        "utilisation_usd": {
+          "description": "Current usage in USD (absolute exposure against the limit).",
+          "minimum": 0,
+          "title": "Utilisation Usd",
+          "type": "number"
+        },
+        "utilisation_pct": {
+          "description": "utilisation_usd as a percent of limit_usd; 82.5 = 82.5%.",
+          "minimum": 0,
+          "title": "Utilisation Pct",
+          "type": "number"
+        },
+        "above_warning_threshold": {
+          "description": "True when utilisation_pct is at or above the configured warning level (80%).",
+          "title": "Above Warning Threshold",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "limit_name",
+        "limit_usd",
+        "utilisation_usd",
+        "utilisation_pct",
+        "above_warning_threshold"
+      ],
+      "title": "LimitUtilisation",
+      "type": "object"
+    },
+    "LocoPremium": {
+      "additionalProperties": false,
+      "description": "Physical premium in one location versus loco London.",
+      "properties": {
+        "location": {
+          "description": "Trading centre, e.g. \"Zurich\", \"Singapore\".",
+          "title": "Location",
+          "type": "string"
+        },
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "premium_usd_per_oz": {
+          "description": "Premium over loco London in USD per troy ounce; negative is a discount.",
+          "title": "Premium Usd Per Oz",
+          "type": "number"
+        }
+      },
+      "required": [
+        "location",
+        "metal",
+        "premium_usd_per_oz"
+      ],
+      "title": "LocoPremium",
+      "type": "object"
+    },
+    "LookAheadSection": {
+      "additionalProperties": false,
+      "description": "Section 7. Next session and next week.\n\n``next_session_events`` covers the following trading day only;\n``next_week_events`` covers the balance of the forward week.",
+      "properties": {
+        "next_session_date": {
+          "format": "date",
+          "title": "Next Session Date",
+          "type": "string"
+        },
+        "next_session_events": {
+          "items": {
+            "$ref": "#/$defs/CalendarEvent"
+          },
+          "title": "Next Session Events",
+          "type": "array"
+        },
+        "next_week_start_date": {
+          "format": "date",
+          "title": "Next Week Start Date",
+          "type": "string"
+        },
+        "next_week_end_date": {
+          "format": "date",
+          "title": "Next Week End Date",
+          "type": "string"
+        },
+        "next_week_events": {
+          "items": {
+            "$ref": "#/$defs/CalendarEvent"
+          },
+          "title": "Next Week Events",
+          "type": "array"
+        },
+        "roll_windows": {
+          "items": {
+            "$ref": "#/$defs/ContractRollWindow"
+          },
+          "title": "Roll Windows",
+          "type": "array"
+        },
+        "holidays": {
+          "description": "Holiday entries affecting London, New York or Shanghai liquidity.",
+          "items": {
+            "$ref": "#/$defs/CalendarEvent"
+          },
+          "title": "Holidays",
+          "type": "array"
+        }
+      },
+      "required": [
+        "next_session_date",
+        "next_session_events",
+        "next_week_start_date",
+        "next_week_end_date",
+        "next_week_events",
+        "roll_windows",
+        "holidays"
+      ],
+      "title": "LookAheadSection",
+      "type": "object"
+    },
+    "Metal": {
+      "description": "Metals in scope, identified by their ISO 4217 commodity code.",
+      "enum": [
+        "XAU",
+        "XAG",
+        "XPT",
+        "XPD"
+      ],
+      "title": "Metal",
+      "type": "string"
+    },
+    "MetalClientFlow": {
+      "additionalProperties": false,
+      "description": "Client activity in one metal across the session.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "net_client_side": {
+          "$ref": "#/$defs/TradeSide",
+          "description": "Direction of the aggregate client flow: buy, sell or flat."
+        },
+        "net_client_oz": {
+          "description": "Net troy ounces; positive when clients bought on balance.",
+          "title": "Net Client Oz",
+          "type": "number"
+        },
+        "net_client_usd": {
+          "description": "Net USD notional of client flow; sign matches net_client_oz.",
+          "title": "Net Client Usd",
+          "type": "number"
+        },
+        "gross_client_oz": {
+          "description": "Sum of absolute client volume in troy ounces (two-way turnover).",
+          "minimum": 0,
+          "title": "Gross Client Oz",
+          "type": "number"
+        },
+        "segment_breakdown": {
+          "description": "Net flow per client segment; sums to net_client_oz / net_client_usd.",
+          "items": {
+            "$ref": "#/$defs/ClientSegmentFlow"
+          },
+          "title": "Segment Breakdown",
+          "type": "array"
+        },
+        "top_axes": {
+          "description": "Up to three short free-text axes, most significant first.",
+          "items": {
+            "type": "string"
+          },
+          "maxItems": 3,
+          "title": "Top Axes",
+          "type": "array"
+        },
+        "unallocated_balance_change_oz": {
+          "description": "Change in client unallocated (loco London) account balances in troy ounces; positive when client metal holdings with the desk increased.",
+          "title": "Unallocated Balance Change Oz",
+          "type": "number"
+        },
+        "ticket_count": {
+          "description": "Total tickets in this metal.",
+          "minimum": 0,
+          "title": "Ticket Count",
+          "type": "integer"
+        },
+        "average_ticket_size_oz": {
+          "description": "Gross ounces divided by ticket_count.",
+          "minimum": 0,
+          "title": "Average Ticket Size Oz",
+          "type": "number"
+        },
+        "average_ticket_size_usd": {
+          "description": "Gross USD notional divided by ticket_count.",
+          "minimum": 0,
+          "title": "Average Ticket Size Usd",
+          "type": "number"
+        }
+      },
+      "required": [
+        "metal",
+        "net_client_side",
+        "net_client_oz",
+        "net_client_usd",
+        "gross_client_oz",
+        "segment_breakdown",
+        "top_axes",
+        "unallocated_balance_change_oz",
+        "ticket_count",
+        "average_ticket_size_oz",
+        "average_ticket_size_usd"
+      ],
+      "title": "MetalClientFlow",
+      "type": "object"
+    },
+    "MetalSnapshot": {
+      "additionalProperties": false,
+      "description": "One metal's line in the header snapshot strip.\n\nPrices are spot loco London in USD per troy ounce unless stated otherwise.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "close_usd_per_oz": {
+          "description": "Spot close at the London close.",
+          "title": "Close Usd Per Oz",
+          "type": "number"
+        },
+        "prior_close_usd_per_oz": {
+          "description": "Previous session's spot close, the comparison basis.",
+          "title": "Prior Close Usd Per Oz",
+          "type": "number"
+        },
+        "change_usd_per_oz": {
+          "description": "close_usd_per_oz minus prior_close_usd_per_oz; signed.",
+          "title": "Change Usd Per Oz",
+          "type": "number"
+        },
+        "change_pct": {
+          "description": "Session change in percent of prior close; signed, 1.25 = +1.25%.",
+          "title": "Change Pct",
+          "type": "number"
+        },
+        "session_high_usd_per_oz": {
+          "description": "Highest spot print of the session.",
+          "title": "Session High Usd Per Oz",
+          "type": "number"
+        },
+        "session_low_usd_per_oz": {
+          "description": "Lowest spot print of the session.",
+          "title": "Session Low Usd Per Oz",
+          "type": "number"
+        },
+        "lbma_pm_auction_usd_per_oz": {
+          "description": "LBMA PM auction price for the session. For silver, which has a single daily auction, the noon auction price is reported here.",
+          "title": "Lbma Pm Auction Usd Per Oz",
+          "type": "number"
+        },
+        "direction": {
+          "$ref": "#/$defs/Direction",
+          "description": "Sign of change_usd_per_oz, driving the coloured indicator."
+        },
+        "price_decimals": {
+          "description": "Decimal places this instrument is quoted to, for display consistency.",
+          "maximum": 4,
+          "minimum": 0,
+          "title": "Price Decimals",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "metal",
+        "close_usd_per_oz",
+        "prior_close_usd_per_oz",
+        "change_usd_per_oz",
+        "change_pct",
+        "session_high_usd_per_oz",
+        "session_low_usd_per_oz",
+        "lbma_pm_auction_usd_per_oz",
+        "direction",
+        "price_decimals"
+      ],
+      "title": "MetalSnapshot",
+      "type": "object"
+    },
+    "MetalTechnicals": {
+      "additionalProperties": false,
+      "description": "Technical picture for one metal at the London close.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "close_usd_per_oz": {
+          "description": "Close the technicals are measured against.",
+          "title": "Close Usd Per Oz",
+          "type": "number"
+        },
+        "ma_50_usd_per_oz": {
+          "description": "50-session simple moving average of closes.",
+          "title": "Ma 50 Usd Per Oz",
+          "type": "number"
+        },
+        "ma_100_usd_per_oz": {
+          "description": "100-session simple moving average of closes.",
+          "title": "Ma 100 Usd Per Oz",
+          "type": "number"
+        },
+        "ma_200_usd_per_oz": {
+          "description": "200-session simple moving average of closes.",
+          "title": "Ma 200 Usd Per Oz",
+          "type": "number"
+        },
+        "rsi_14": {
+          "description": "14-session Wilder RSI, 0-100.",
+          "maximum": 100,
+          "minimum": 0,
+          "title": "Rsi 14",
+          "type": "number"
+        },
+        "support_levels": {
+          "description": "Key supports, nearest to the market first.",
+          "items": {
+            "$ref": "#/$defs/TechnicalLevel"
+          },
+          "title": "Support Levels",
+          "type": "array"
+        },
+        "resistance_levels": {
+          "description": "Key resistances, nearest to the market first.",
+          "items": {
+            "$ref": "#/$defs/TechnicalLevel"
+          },
+          "title": "Resistance Levels",
+          "type": "array"
+        },
+        "trend_label": {
+          "$ref": "#/$defs/TrendLabel"
+        },
+        "nearest_level_type": {
+          "$ref": "#/$defs/LevelType",
+          "description": "Whether the nearest level of any kind is support or resistance."
+        },
+        "nearest_level_usd_per_oz": {
+          "description": "Price of that nearest level.",
+          "title": "Nearest Level Usd Per Oz",
+          "type": "number"
+        },
+        "distance_to_nearest_level_pct": {
+          "description": "Absolute distance from close to the nearest level, in percent.",
+          "title": "Distance To Nearest Level Pct",
+          "type": "number"
+        },
+        "realised_vol_1m_pct": {
+          "description": "Annualised realised volatility over the last 21 sessions, in percent.",
+          "minimum": 0,
+          "title": "Realised Vol 1M Pct",
+          "type": "number"
+        },
+        "implied_vol_1m_pct": {
+          "description": "1-month at-the-money implied volatility, in percent.",
+          "minimum": 0,
+          "title": "Implied Vol 1M Pct",
+          "type": "number"
+        },
+        "vol_spread_pct": {
+          "description": "implied_vol_1m_pct minus realised_vol_1m_pct, in volatility points.",
+          "title": "Vol Spread Pct",
+          "type": "number"
+        },
+        "price_history": {
+          "description": "Daily bars ending on the report date, oldest first. Long enough to draw the 200-day moving average.",
+          "items": {
+            "$ref": "#/$defs/PriceBar"
+          },
+          "title": "Price History",
+          "type": "array"
+        }
+      },
+      "required": [
+        "metal",
+        "close_usd_per_oz",
+        "ma_50_usd_per_oz",
+        "ma_100_usd_per_oz",
+        "ma_200_usd_per_oz",
+        "rsi_14",
+        "support_levels",
+        "resistance_levels",
+        "trend_label",
+        "nearest_level_type",
+        "nearest_level_usd_per_oz",
+        "distance_to_nearest_level_pct",
+        "realised_vol_1m_pct",
+        "implied_vol_1m_pct",
+        "vol_spread_pct",
+        "price_history"
+      ],
+      "title": "MetalTechnicals",
+      "type": "object"
+    },
+    "OptionsGreeks": {
+      "additionalProperties": false,
+      "description": "Options book greeks for one metal, expressed per-metal not per-strike.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "delta_oz": {
+          "description": "Options delta in troy ounces; positive long.",
+          "title": "Delta Oz",
+          "type": "number"
+        },
+        "gamma_oz_per_pct": {
+          "description": "Change in delta (troy ounces) for a +1% move in spot.",
+          "title": "Gamma Oz Per Pct",
+          "type": "number"
+        },
+        "vega_usd_per_vol_pt": {
+          "description": "P&L in USD for a +1 volatility point move in implied vol.",
+          "title": "Vega Usd Per Vol Pt",
+          "type": "number"
+        },
+        "theta_usd_per_day": {
+          "description": "Expected P&L in USD from one calendar day of time decay; usually negative when long options.",
+          "title": "Theta Usd Per Day",
+          "type": "number"
+        }
+      },
+      "required": [
+        "metal",
+        "delta_oz",
+        "gamma_oz_per_pct",
+        "vega_usd_per_vol_pt",
+        "theta_usd_per_day"
+      ],
+      "title": "OptionsGreeks",
+      "type": "object"
+    },
+    "PhysicalSection": {
+      "additionalProperties": false,
+      "description": "Section 6. Inventories, regional premiums and lease rates.\n\nMixed frequencies: COMEX stocks are daily, SGE withdrawals weekly, LBMA\nvault holdings monthly. Each model states its own effective period.",
+      "properties": {
+        "comex_stocks": {
+          "items": {
+            "$ref": "#/$defs/ComexStocks"
+          },
+          "title": "Comex Stocks",
+          "type": "array"
+        },
+        "lbma_vault_holdings": {
+          "items": {
+            "$ref": "#/$defs/LbmaVaultHolding"
+          },
+          "title": "Lbma Vault Holdings",
+          "type": "array"
+        },
+        "lbma_monthly_note": {
+          "description": "Human-readable note explaining the monthly LBMA publication lag.",
+          "title": "Lbma Monthly Note",
+          "type": "string"
+        },
+        "sge": {
+          "items": {
+            "$ref": "#/$defs/SgeActivity"
+          },
+          "title": "Sge",
+          "type": "array"
+        },
+        "loco_premiums": {
+          "items": {
+            "$ref": "#/$defs/LocoPremium"
+          },
+          "title": "Loco Premiums",
+          "type": "array"
+        },
+        "lease_rates": {
+          "items": {
+            "$ref": "#/$defs/LeaseRate"
+          },
+          "title": "Lease Rates",
+          "type": "array"
+        }
+      },
+      "required": [
+        "comex_stocks",
+        "lbma_vault_holdings",
+        "lbma_monthly_note",
+        "sge",
+        "loco_premiums",
+        "lease_rates"
+      ],
+      "title": "PhysicalSection",
+      "type": "object"
+    },
+    "PnlAttribution": {
+      "additionalProperties": false,
+      "description": "Daily P&L split by driver. Components sum to total_usd.",
+      "properties": {
+        "spot_usd": {
+          "description": "P&L from outright spot exposure.",
+          "title": "Spot Usd",
+          "type": "number"
+        },
+        "carry_forward_usd": {
+          "description": "P&L from forwards, leases and financing (carry).",
+          "title": "Carry Forward Usd",
+          "type": "number"
+        },
+        "volatility_usd": {
+          "description": "P&L from the options book's vol exposure.",
+          "title": "Volatility Usd",
+          "type": "number"
+        },
+        "client_flow_usd": {
+          "description": "P&L captured on client spread / franchise.",
+          "title": "Client Flow Usd",
+          "type": "number"
+        },
+        "other_usd": {
+          "description": "Residual: fees, funding adjustments, rounding.",
+          "title": "Other Usd",
+          "type": "number"
+        },
+        "total_usd": {
+          "description": "Sum of the five components; the day's P&L.",
+          "title": "Total Usd",
+          "type": "number"
+        }
+      },
+      "required": [
+        "spot_usd",
+        "carry_forward_usd",
+        "volatility_usd",
+        "client_flow_usd",
+        "other_usd",
+        "total_usd"
+      ],
+      "title": "PnlAttribution",
+      "type": "object"
+    },
+    "PositioningSection": {
+      "additionalProperties": false,
+      "description": "Section 5. Exchange open interest, COT positioning and EFP levels.",
+      "properties": {
+        "contracts": {
+          "items": {
+            "$ref": "#/$defs/ComexContractActivity"
+          },
+          "title": "Contracts",
+          "type": "array"
+        },
+        "cot": {
+          "items": {
+            "$ref": "#/$defs/CotManagedMoney"
+          },
+          "title": "Cot",
+          "type": "array"
+        },
+        "cot_report_date": {
+          "description": "Survey date shared by the COT lines, surfaced for the heading.",
+          "format": "date",
+          "title": "Cot Report Date",
+          "type": "string"
+        },
+        "cot_lag_days": {
+          "description": "Calendar days between cot_report_date and the report date.",
+          "minimum": 0,
+          "title": "Cot Lag Days",
+          "type": "integer"
+        },
+        "efp": {
+          "items": {
+            "$ref": "#/$defs/EfpLevel"
+          },
+          "title": "Efp",
+          "type": "array"
+        },
+        "any_efp_flagged": {
+          "description": "True when at least one EFP is outside its recent range.",
+          "title": "Any Efp Flagged",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "contracts",
+        "cot",
+        "cot_report_date",
+        "cot_lag_days",
+        "efp",
+        "any_efp_flagged"
+      ],
+      "title": "PositioningSection",
+      "type": "object"
+    },
+    "PriceBar": {
+      "additionalProperties": false,
+      "description": "One daily OHLC bar of spot history, USD per troy ounce.",
+      "properties": {
+        "session_date": {
+          "format": "date",
+          "title": "Session Date",
+          "type": "string"
+        },
+        "open_usd_per_oz": {
+          "title": "Open Usd Per Oz",
+          "type": "number"
+        },
+        "high_usd_per_oz": {
+          "title": "High Usd Per Oz",
+          "type": "number"
+        },
+        "low_usd_per_oz": {
+          "title": "Low Usd Per Oz",
+          "type": "number"
+        },
+        "close_usd_per_oz": {
+          "title": "Close Usd Per Oz",
+          "type": "number"
+        }
+      },
+      "required": [
+        "session_date",
+        "open_usd_per_oz",
+        "high_usd_per_oz",
+        "low_usd_per_oz",
+        "close_usd_per_oz"
+      ],
+      "title": "PriceBar",
+      "type": "object"
+    },
+    "ReportHeader": {
+      "additionalProperties": false,
+      "description": "Report identity plus the snapshot strip that opens the email.",
+      "properties": {
+        "report_date": {
+          "description": "London trading date the report covers.",
+          "format": "date",
+          "title": "Report Date",
+          "type": "string"
+        },
+        "generated_at_london": {
+          "description": "Timezone-aware instant the report was generated, Europe/London.",
+          "format": "date-time",
+          "title": "Generated At London",
+          "type": "string"
+        },
+        "report_label": {
+          "description": "Fixed label, e.g. \"EOD \u2014 London close\", shown beside the date.",
+          "title": "Report Label",
+          "type": "string"
+        },
+        "author_name": {
+          "description": "Analyst publishing the report; free text.",
+          "title": "Author Name",
+          "type": "string"
+        },
+        "headline": {
+          "default": "",
+          "description": "One-line headline typed by the analyst; empty is omitted from the email.",
+          "title": "Headline",
+          "type": "string"
+        },
+        "snapshot": {
+          "description": "One entry per metal in scope, in report order.",
+          "items": {
+            "$ref": "#/$defs/MetalSnapshot"
+          },
+          "title": "Snapshot",
+          "type": "array"
+        }
+      },
+      "required": [
+        "report_date",
+        "generated_at_london",
+        "report_label",
+        "author_name",
+        "snapshot"
+      ],
+      "title": "ReportHeader",
+      "type": "object"
+    },
+    "RiskSection": {
+      "additionalProperties": false,
+      "description": "Section 2. Position, P&L, VaR, greeks and limit usage.",
+      "properties": {
+        "positions": {
+          "items": {
+            "$ref": "#/$defs/DeskPosition"
+          },
+          "title": "Positions",
+          "type": "array"
+        },
+        "daily_pnl_usd": {
+          "description": "Session P&L across the desk; positive is profit.",
+          "title": "Daily Pnl Usd",
+          "type": "number"
+        },
+        "mtd_pnl_usd": {
+          "description": "Month-to-date P&L across the desk.",
+          "title": "Mtd Pnl Usd",
+          "type": "number"
+        },
+        "ytd_pnl_usd": {
+          "description": "Year-to-date P&L across the desk.",
+          "title": "Ytd Pnl Usd",
+          "type": "number"
+        },
+        "pnl_attribution": {
+          "$ref": "#/$defs/PnlAttribution"
+        },
+        "desk_var_1d_99_usd": {
+          "description": "Diversified desk-level 1-day 99% VaR in USD (positive loss). Lower than the sum of per-metal VaRs because of correlation benefit.",
+          "minimum": 0,
+          "title": "Desk Var 1D 99 Usd",
+          "type": "number"
+        },
+        "greeks": {
+          "items": {
+            "$ref": "#/$defs/OptionsGreeks"
+          },
+          "title": "Greeks",
+          "type": "array"
+        },
+        "limits": {
+          "items": {
+            "$ref": "#/$defs/LimitUtilisation"
+          },
+          "title": "Limits",
+          "type": "array"
+        },
+        "any_limit_flagged": {
+          "description": "True when at least one limit is at or above the warning threshold.",
+          "title": "Any Limit Flagged",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "positions",
+        "daily_pnl_usd",
+        "mtd_pnl_usd",
+        "ytd_pnl_usd",
+        "pnl_attribution",
+        "desk_var_1d_99_usd",
+        "greeks",
+        "limits",
+        "any_limit_flagged"
+      ],
+      "title": "RiskSection",
+      "type": "object"
+    },
+    "SgeActivity": {
+      "additionalProperties": false,
+      "description": "Shanghai Gold Exchange withdrawals and the Shanghai premium.",
+      "properties": {
+        "metal": {
+          "$ref": "#/$defs/Metal"
+        },
+        "withdrawals_tonnes": {
+          "description": "Metal withdrawn from SGE vaults over the reporting week, in tonnes.",
+          "minimum": 0,
+          "title": "Withdrawals Tonnes",
+          "type": "number"
+        },
+        "withdrawals_period_days": {
+          "description": "Length of the withdrawal reporting period, in days.",
+          "exclusiveMinimum": 0,
+          "title": "Withdrawals Period Days",
+          "type": "integer"
+        },
+        "premium_usd_per_oz": {
+          "description": "Shanghai price versus loco London in USD per troy ounce; positive is a premium, negative a discount.",
+          "title": "Premium Usd Per Oz",
+          "type": "number"
+        },
+        "premium_pct": {
+          "description": "The same premium as a percent of loco London; signed.",
+          "title": "Premium Pct",
+          "type": "number"
+        }
+      },
+      "required": [
+        "metal",
+        "withdrawals_tonnes",
+        "withdrawals_period_days",
+        "premium_usd_per_oz",
+        "premium_pct"
+      ],
+      "title": "SgeActivity",
+      "type": "object"
+    },
+    "TechnicalLevel": {
+      "additionalProperties": false,
+      "description": "A single support or resistance level.",
+      "properties": {
+        "level_type": {
+          "$ref": "#/$defs/LevelType"
+        },
+        "price_usd_per_oz": {
+          "title": "Price Usd Per Oz",
+          "type": "number"
+        },
+        "label": {
+          "description": "Short human label, e.g. \"prior range low\", \"38.2% retracement\".",
+          "title": "Label",
+          "type": "string"
+        },
+        "distance_pct": {
+          "description": "Signed distance from the current close to this level, in percent of the close; positive when the level is above the market.",
+          "title": "Distance Pct",
+          "type": "number"
+        }
+      },
+      "required": [
+        "level_type",
+        "price_usd_per_oz",
+        "label",
+        "distance_pct"
+      ],
+      "title": "TechnicalLevel",
+      "type": "object"
+    },
+    "TechnicalsSection": {
+      "additionalProperties": false,
+      "description": "Section 3. One technical block per metal plus charting defaults.\n\nThe app charts a single analyst-selected metal rather than four charts, so\nthe section carries a default selection.",
+      "properties": {
+        "metals": {
+          "items": {
+            "$ref": "#/$defs/MetalTechnicals"
+          },
+          "title": "Metals",
+          "type": "array"
+        },
+        "default_chart_metal": {
+          "$ref": "#/$defs/Metal",
+          "description": "Metal charted when the analyst has not chosen one."
+        },
+        "history_session_count": {
+          "description": "Number of bars supplied per metal in price_history.",
+          "exclusiveMinimum": 0,
+          "title": "History Session Count",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "metals",
+        "default_chart_metal",
+        "history_session_count"
+      ],
+      "title": "TechnicalsSection",
+      "type": "object"
+    },
+    "TradeSide": {
+      "description": "Side of a net flow, from the client's perspective.",
+      "enum": [
+        "buy",
+        "sell",
+        "flat"
+      ],
+      "title": "TradeSide",
+      "type": "string"
+    },
+    "TrendLabel": {
+      "description": "Analyst-facing trend classification from the technical screen.",
+      "enum": [
+        "uptrend",
+        "range",
+        "downtrend"
+      ],
+      "title": "TrendLabel",
+      "type": "string"
+    }
+  },
+  "additionalProperties": false,
+  "description": "One day's complete report: all seven sections plus the header.\n\nThis is the object handed to the email renderer and the shape serialised to\n``schema/sample_payload.json``.",
+  "properties": {
+    "header": {
+      "$ref": "#/$defs/ReportHeader"
+    },
+    "client_flows": {
+      "$ref": "#/$defs/ClientFlowsSection"
+    },
+    "risk": {
+      "$ref": "#/$defs/RiskSection"
+    },
+    "technicals": {
+      "$ref": "#/$defs/TechnicalsSection"
+    },
+    "etf": {
+      "$ref": "#/$defs/EtfSection"
+    },
+    "positioning": {
+      "$ref": "#/$defs/PositioningSection"
+    },
+    "physical": {
+      "$ref": "#/$defs/PhysicalSection"
+    },
+    "look_ahead": {
+      "$ref": "#/$defs/LookAheadSection"
+    }
+  },
+  "required": [
+    "header",
+    "client_flows",
+    "risk",
+    "technicals",
+    "etf",
+    "positioning",
+    "physical",
+    "look_ahead"
+  ],
+  "title": "EodReport",
+  "type": "object"
+}
