@@ -1,0 +1,61 @@
+"""Example of where SMTP delivery plugs in — deliberately not wired up.
+
+Copy this file to ``report/send.py`` and uncomment the body to make it real.
+The prototype never sends anything: the app renders HTML, previews it and
+offers a download, and delivery is somebody else's decision.
+
+The one function the rest of the system should ever call is
+``send_report(html, recipients, subject)``. Keep that signature stable — the
+Streamlit app, a cron job and the Rust implementation can all sit behind it.
+
+Notes for whoever wires this up
+-------------------------------
+* Credentials come from the environment or the firm's secret store, never from
+  this repository and never from ``config.py``.
+* Send ``text/html`` as the primary part with a ``text/plain`` alternative;
+  some clients and most archives want the plain text.
+* The HTML from ``report.render.render_report`` is already self-contained —
+  charts are base64 data URIs, so there are no attachments to add. If Outlook
+  desktop blocks data-URI images in your environment, switch the renderer to
+  ``cid:`` attachments here rather than changing the template.
+* Compliance: an end-of-day desk report usually has to be journalled. Send
+  through the firm's relay so it lands in the archive, rather than an external
+  provider.
+"""
+
+from __future__ import annotations
+
+# from email.message import EmailMessage
+# import os
+# import smtplib
+
+
+def send_report(html: str, recipients: list[str], subject: str) -> None:
+    """Send the rendered report to ``recipients``.
+
+    Args:
+        html: complete, self-contained HTML document from ``render_report``.
+        recipients: RFC 5322 addresses; the caller decides To vs Bcc policy.
+        subject: subject line, e.g. from ``render.email_subject``.
+
+    Raises:
+        NotImplementedError: always, until this stub is replaced.
+    """
+    raise NotImplementedError(
+        "Delivery is intentionally not implemented in the prototype. "
+        "Copy report/send.py.example to report/send.py and uncomment the body."
+    )
+
+    # message = EmailMessage()
+    # message["Subject"] = subject
+    # message["From"] = os.environ["EOD_REPORT_FROM"]
+    # message["To"] = ", ".join(recipients)
+    # message.set_content(
+    #     "This report is formatted as HTML. Ask the desk for a plain-text copy."
+    # )
+    # message.add_alternative(html, subtype="html")
+    #
+    # with smtplib.SMTP(os.environ["SMTP_HOST"], int(os.environ["SMTP_PORT"])) as smtp:
+    #     smtp.starttls()
+    #     smtp.login(os.environ["SMTP_USER"], os.environ["SMTP_PASSWORD"])
+    #     smtp.send_message(message)

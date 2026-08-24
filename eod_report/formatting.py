@@ -24,9 +24,15 @@ EMPTY = "—"
 
 
 def fmt_number(value: float | int | None, decimals: int = 0, signed: bool = False) -> str:
-    """Thousands-separated number, optionally with an explicit + sign."""
+    """Thousands-separated number, optionally with an explicit + sign.
+
+    A value that rounds to zero at this precision is printed unsigned: a
+    "-0.00" in a report reads as a fault, not as a small negative.
+    """
     if value is None:
         return EMPTY
+    if round(value, decimals) == 0:
+        return f"{abs(round(value, decimals)):,.{decimals}f}"
     return f"{value:{'+' if signed else ''},.{decimals}f}"
 
 
@@ -59,6 +65,8 @@ def fmt_usd_compact(value: float | None, signed: bool = False) -> str:
     if value is None:
         return EMPTY
     magnitude = abs(value)
+    if magnitude < 0.5:  # rounds to $0 at every scale below
+        return "$0"
     sign = "+" if signed and value > 0 else "-" if value < 0 else ""
     if magnitude >= 1_000_000_000:
         return f"{sign}${magnitude / 1_000_000_000:,.2f}bn"

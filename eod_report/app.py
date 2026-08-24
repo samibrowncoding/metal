@@ -19,6 +19,7 @@ import config
 from data.provider import build_report, get_provider
 from formatting import fmt_date, fmt_datetime_london
 from models import EodReport, SectionKey
+from report.render import email_subject, render_report
 from ui import commentary as commentary_ui
 from ui import sections as section_ui
 
@@ -134,14 +135,70 @@ def render_section(
             commentary_ui.render_box(key, report_date, label)
 
 
+def render_export_tab(report: EodReport, report_date: date) -> None:
+    """Generate, preview, download and copy the email HTML."""
+    commentary = commentary_ui.current_commentary(report_date)
+    chart_metal = st.session_state.get("chart_metal", report.technicals.default_chart_metal)
+
+    generate, spacer = st.columns([1, 3])
+    with generate:
+        if st.button("Generate report", type="primary", width="stretch"):
+            st.session_state["generated_html"] = render_report(
+                report, commentary, chart_metal=chart_metal, theme="light"
+            )
+            st.session_state["generated_at"] = datetime.now(config.LONDON_TZ)
+            st.session_state["generated_subject"] = email_subject(report, commentary)
+    with spacer:
+        if st.session_state.get("generated_at"):
+            st.caption(
+                f"Last generated {st.session_state['generated_at']:%H:%M:%S} London. "
+                "Regenerate after editing commentary."
+            )
+
+    html = st.session_state.get("generated_html")
+    if not html:
+        st.info(
+            "Write your commentary, then generate the report to preview the email "
+            "exactly as it will arrive."
+        )
+        return
+
+    st.text_input("Subject", value=st.session_state["generated_subject"], disabled=True)
+    download, size = st.columns([1, 3])
+    with download:
+        st.download_button(
+            "Download .html",
+            data=html,
+            file_name=f"precious-metals-eod-{report_date:%Y-%m-%d}.html",
+            mime="text/html",
+            width="stretch",
+        )
+    with size:
+        embedded = "with embedded charts" if "<img" in html else "tables only (kaleido unavailable)"
+        st.caption(f"{len(html.encode('utf-8')) / 1024:,.0f} KB, self-contained, {embedded}.")
+
+    preview_tab, source_tab = st.tabs(["Preview", "Copy HTML"])
+    with preview_tab:
+        # The email is a whole HTML document, so it previews inside an iframe
+        # rather than being injected into the page.
+        st.iframe(html, height=900)
+    with source_tab:
+        st.caption("Use the copy button in the top right of the block.")
+        st.code(html, language="html", height=600)
+
+
 def main() -> None:
     report_date, author = render_sidebar()
     report = load_report(report_date, author)
     theme = current_theme()
 
-    render_header(report, report_date)
-    for number, heading, key in SECTION_LAYOUT:
-        render_section(number, heading, key, report, report_date, theme)
+    data_tab, export_tab = st.tabs(["Desk data & commentary", "Report"])
+    with data_tab:
+        render_header(report, report_date)
+        for number, heading, key in SECTION_LAYOUT:
+            render_section(number, heading, key, report, report_date, theme)
+    with export_tab:
+        render_export_tab(report, report_date)
 
 
 main()

@@ -1,0 +1,141 @@
+{#
+  Email template for the EOD precious metals report.
+
+  Rules this file follows, because Outlook is assumed as the worst case:
+    * every layout is a table; no div-based columns, no flexbox, no grid
+    * every style is inline on the element; no <style> block, no classes
+    * no JavaScript, no external stylesheets, no remote images
+    * width capped at {{ max_width }}px, Arial/Helvetica stack throughout
+    * numbers right-aligned, colour only on directional figures
+
+  All formatting decisions were made in render.py. This file places strings.
+#}
+{% macro table_block(block) -%}
+{% if block.caption %}
+        <p style="margin:0 0 6px 0;font-family:{{ font_stack }};font-size:11px;line-height:16px;color:{{ colours.muted }};">{{ block.caption }}</p>
+{% endif %}
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;margin:0 0 18px 0;">
+          <tr>
+{% for column in block.columns %}
+            <th align="{{ column.align }}" style="padding:6px 8px;background-color:{{ colours.band }};border-bottom:1px solid {{ colours.rule }};font-family:{{ font_stack }};font-size:11px;line-height:14px;font-weight:bold;color:{{ colours.muted }};text-align:{{ column.align }};">{{ column.label }}</th>
+{% endfor %}
+          </tr>
+{% for row in block.rows %}
+          <tr>
+{% for cell in row %}
+            <td align="{{ cell.align }}" style="padding:6px 8px;border-bottom:1px solid {{ colours.rule }};font-family:{{ font_stack }};font-size:12px;line-height:17px;text-align:{{ cell.align }};color:{{ cell.colour or colours.text }};{% if cell.bold %}font-weight:bold;{% endif %}">{{ cell.text }}</td>
+{% endfor %}
+          </tr>
+{% endfor %}
+        </table>
+{%- endmacro %}
+{% macro notes_block(block) -%}
+{% if block.caption %}
+        <p style="margin:0 0 6px 0;font-family:{{ font_stack }};font-size:11px;line-height:16px;color:{{ colours.muted }};">{{ block.caption }}</p>
+{% endif %}
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;margin:0 0 18px 0;">
+{% for line in block.lines %}
+          <tr>
+            <td style="padding:3px 0;font-family:{{ font_stack }};font-size:12px;line-height:18px;color:{{ colours.text }};">{{ line }}</td>
+          </tr>
+{% endfor %}
+        </table>
+{%- endmacro %}
+{% macro image_block(block) -%}
+        <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;margin:0 0 18px 0;">
+          <tr>
+            <td align="center" style="padding:0;">
+              <img src="{{ block.src }}" alt="{{ block.alt }}" width="{{ block.width }}" style="display:block;width:100%;max-width:{{ block.width }}px;height:auto;border:0;outline:none;text-decoration:none;">
+            </td>
+          </tr>
+        </table>
+{%- endmacro %}
+{% macro render_block(block) -%}
+{% if block.kind == 'table' %}{{ table_block(block) }}{% elif block.kind == 'notes' %}{{ notes_block(block) }}{% elif block.kind == 'image' %}{{ image_block(block) }}{% endif %}
+{%- endmacro %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<title>{{ subject }}</title>
+</head>
+<body style="margin:0;padding:0;background-color:#eeeeec;">
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background-color:#eeeeec;">
+  <tr>
+    <td align="center" style="padding:20px 10px;">
+
+      <table role="presentation" width="{{ max_width }}" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:{{ max_width }}px;background-color:#ffffff;border:1px solid {{ colours.rule }};">
+
+        <!-- masthead -->
+        <tr>
+          <td style="padding:26px 28px 18px 28px;border-bottom:2px solid {{ colours.accent }};">
+            <p style="margin:0 0 4px 0;font-family:{{ font_stack }};font-size:19px;line-height:24px;font-weight:bold;color:{{ colours.text }};">Precious metals — end of day</p>
+            <p style="margin:0;font-family:{{ font_stack }};font-size:12px;line-height:18px;color:{{ colours.muted }};">{{ report_label }} &nbsp;·&nbsp; {{ report_date }}{% if author %} &nbsp;·&nbsp; {{ author }}{% endif %}</p>
+          </td>
+        </tr>
+
+{% if headline %}
+        <!-- headline -->
+        <tr>
+          <td style="padding:20px 28px 0 28px;">
+            <p style="margin:0;font-family:{{ font_stack }};font-size:16px;line-height:24px;font-weight:bold;color:{{ colours.accent }};">{{ headline }}</p>
+          </td>
+        </tr>
+{% endif %}
+
+        <!-- snapshot strip -->
+        <tr>
+          <td style="padding:20px 28px 0 28px;">
+            {{ table_block(snapshot) }}
+          </td>
+        </tr>
+
+{% if market_overview %}
+        <!-- market overview -->
+        <tr>
+          <td style="padding:0 28px;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background-color:{{ colours.band }};border-left:3px solid {{ colours.accent }};margin:0 0 8px 0;">
+              <tr>
+                <td style="padding:14px 16px;">
+{% for paragraph in market_overview %}
+                  <p style="margin:0 0 {% if not loop.last %}10{% else %}0{% endif %}px 0;font-family:{{ font_stack }};font-size:13px;line-height:21px;color:{{ colours.text }};">{{ paragraph }}</p>
+{% endfor %}
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+{% endif %}
+
+{% for section in sections %}
+        <!-- section {{ section.number }} -->
+        <tr>
+          <td style="padding:22px 28px 0 28px;">
+            <p style="margin:0 0 14px 0;padding:0 0 6px 0;border-bottom:1px solid {{ colours.rule }};font-family:{{ font_stack }};font-size:14px;line-height:20px;font-weight:bold;color:{{ colours.accent }};">{{ section.number }} &nbsp; {{ section.title }}</p>
+{% for paragraph in section.commentary %}
+            <p style="margin:0 0 14px 0;font-family:{{ font_stack }};font-size:13px;line-height:21px;color:{{ colours.text }};">{{ paragraph }}</p>
+{% endfor %}
+{% for block in section.blocks %}
+{{ render_block(block) }}
+{% endfor %}
+          </td>
+        </tr>
+{% endfor %}
+
+        <!-- footer -->
+        <tr>
+          <td style="padding:8px 28px 26px 28px;border-top:1px solid {{ colours.rule }};">
+            <p style="margin:14px 0 0 0;font-family:{{ font_stack }};font-size:11px;line-height:17px;color:{{ colours.muted }};">{{ footer }}</p>
+            <p style="margin:8px 0 0 0;font-family:{{ font_stack }};font-size:11px;line-height:17px;color:{{ colours.muted }};">Generated {{ generated_at }}.</p>
+          </td>
+        </tr>
+
+      </table>
+
+    </td>
+  </tr>
+</table>
+</body>
+</html>

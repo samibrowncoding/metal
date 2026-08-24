@@ -25,7 +25,6 @@ from formatting import (
     fmt_price,
     fmt_time,
     fmt_tonnes,
-    fmt_usd,
     fmt_usd_compact,
 )
 from models import (
