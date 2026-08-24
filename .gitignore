@@ -1,0 +1,10 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+.DS_Store
+.streamlit/secrets.toml
+
+# Analyst drafts are local working files, not source
+eod_report/commentary/*.json
