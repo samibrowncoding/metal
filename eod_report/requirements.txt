@@ -1,0 +1,17 @@
+# Python 3.11 or newer.
+#
+# Install with:  pip install -r requirements.txt
+# Run with:      streamlit run app.py
+
+streamlit>=1.40
+pandas>=2.2
+pydantic>=2.7
+plotly>=5.22
+jinja2>=3.1
+
+# Optional — embeds the charts in the email as base64 PNGs.
+# Without it the email renders its tables and drops the images silently, which
+# is the behaviour behind config.EMBED_CHARTS_IN_EMAIL. Kaleido v1 also needs a
+# Chrome or Chromium binary on the machine (`plotly_get_chrome` installs one).
+#
+# kaleido>=1.0
