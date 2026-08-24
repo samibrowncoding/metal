@@ -495,3 +495,47 @@ EMAIL_COLOURS: dict[str, str] = {
 
 EMAIL_MAX_WIDTH_PX: int = 800
 EMAIL_FONT_STACK: str = "Arial, Helvetica, sans-serif"
+
+#: On-screen chart palette, one entry per theme. The seven ``segment_*`` hues
+#: are assigned to client segments in the fixed order of ``CLIENT_SEGMENTS`` and
+#: are never cycled or reordered; the three ``ma_*`` hues colour the moving
+#: averages. Both sets were checked for colour-vision separation and contrast
+#: against their own surface in each theme.
+CHART_COLOURS: dict[str, dict[str, str]] = {
+    "light": {
+        "ink": "#0b0b0b",
+        "muted": "#898781",
+        "grid": "#e1e0d9",
+        "axis": "#c3c2b7",
+        "price": "#0b0b0b",
+        "ma_50": "#2a78d6",
+        "ma_100": "#eb6834",
+        "ma_200": "#1baf7a",
+        "level": "#898781",
+        "segment_1": "#2a78d6",
+        "segment_2": "#eb6834",
+        "segment_3": "#1baf7a",
+        "segment_4": "#eda100",
+        "segment_5": "#e87ba4",
+        "segment_6": "#008300",
+        "segment_7": "#4a3aa7",
+    },
+    "dark": {
+        "ink": "#ffffff",
+        "muted": "#898781",
+        "grid": "#2c2c2a",
+        "axis": "#383835",
+        "price": "#ffffff",
+        "ma_50": "#3987e5",
+        "ma_100": "#d95926",
+        "ma_200": "#199e70",
+        "level": "#898781",
+        "segment_1": "#3987e5",
+        "segment_2": "#d95926",
+        "segment_3": "#199e70",
+        "segment_4": "#c98500",
+        "segment_5": "#d55181",
+        "segment_6": "#008300",
+        "segment_7": "#9085e9",
+    },
+}
