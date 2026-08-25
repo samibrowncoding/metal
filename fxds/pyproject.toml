@@ -1,0 +1,45 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "fxds"
+version = "0.1.0"
+description = "A learning repository for FX derivatives, reproducing Practicals A-F from FX Derivatives Trader School (Jewitt, 2015)"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+
+dependencies = [
+    "numpy>=1.26",
+    "pandas>=2.1",
+    "scipy>=1.11",
+    "matplotlib>=3.8",
+    "plotly>=5.18",
+    "streamlit>=1.30",
+    "pydantic>=2.5",
+    "python-dateutil>=2.8",
+    "pyyaml>=6.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.4",
+    "hypothesis>=6.92",
+    "jupyter>=1.0",
+    "nbclient>=0.9",
+    "nbformat>=5.9",
+    "ipywidgets>=8.1",
+    "pyarrow>=14.0",
+]
+# Live market data connectors. Neither is required for anything in this repo:
+# every practical, notebook and test runs on the synthetic FakeProvider.
+bloomberg = ["xbbg>=0.7"]
+eikon = ["eikon>=1.1"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+filterwarnings = ["error::RuntimeWarning"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["fxds"]
