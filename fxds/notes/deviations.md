@@ -35,8 +35,8 @@ already taken in `notes/source_notes.md` but not yet in code.
 
 | Tag | Book | Here | Why |
 |---|---|---|---|
-| [EXCEL] | 101 rows on a sheet from −5 to +5 standard deviations | A numpy array over the same grid | Same numbers. Vectorised where it does not obscure the formula. *(planned)* |
-| [CONVENTION] | Test 2 gives `S = K = 100`, `r1 = r2 = 0`, `T = 1.0` and expects "very slightly under 4.00 CCY1%" but does not state σ in the text | σ = 10% | The closed-form ATM value `0.3989·σ·√T` gives 3.99% at σ = 10%, which is what "very slightly under 4.00" describes. Consistent with the σ used in Practical C's test. *(planned)* |
+| [EXCEL] | 101 rows on a sheet from −5 to +5 standard deviations | A numpy array over the same grid, returned as a DataFrame | Same numbers, same row alignment (a row's probability bounds the bucket running to the *next* row). Vectorised where it does not obscure the formula. **Implemented.** |
+| [CONVENTION] | Test 2 gives `S = K = 100`, `r1 = r2 = 0`, `T = 1.0` and expects "very slightly under 4.00 CCY1%" but does not state σ in the text | σ = 10% | The closed-form ATM value `0.3989·σ·√T` gives 3.99% at σ = 10%, which is what "very slightly under 4.00" describes. Consistent with the σ used in Practical C's test. **Implemented**: `tests/test_numerical.py` asserts 3.9969%, and the integration agrees with the closed form to 2.3e-3 relative on the book's own grid. |
 
 ---
 
@@ -44,9 +44,13 @@ already taken in `notes/source_notes.md` but not yet in code.
 
 | Tag | Book | Here | Why |
 |---|---|---|---|
-| [FIX] | The printed VBA guard reads `If (T >= 0) Then T = 0.0000000001` (and likewise for volatility) | `if T <= 0: T = 1e-10` | As printed the guard fires on every valid input and destroys the price. The surrounding prose says the intent plainly: clamp non-positive time and volatility to a small positive value so the formula returns the payoff at maturity. Implemented per the prose. *(planned)* |
-| [EXCEL] | Task B exists to move the calculation from cell formulas into a VBA function | The module function is the only implementation | In Python there is no cell-formula stage to graduate from. The task's actual content — the input signature, the guard, the structure — is implemented. *(planned)* |
-| [EXCEL] | `Application.WorksheetFunction.NormSDist` | `scipy.stats.norm.cdf` | Same function. *(planned)* |
+| [FIX] | The printed VBA guard reads `If (T >= 0) Then T = 0.0000000001` (and likewise for volatility) | `if T <= 0: T = 1e-10` | As printed the guard fires on every valid input and destroys the price. The surrounding prose says the intent plainly: clamp non-positive time and volatility to a small positive value so the formula returns the payoff at maturity. Implemented per the prose. **Regression test**: `TestExpiryAndVolGuards::test_guard_does_not_fire_on_valid_inputs` fails if the comparison is ever inverted back. |
+| [EXCEL] | Task B exists to move the calculation from cell formulas into a VBA function | The module function is the only implementation | In Python there is no cell-formula stage to graduate from. The task's actual content — the input signature, the guard, the structure — is implemented. **Implemented.** |
+| [EXCEL] | `Application.WorksheetFunction.NormSDist` | `scipy.stats.norm.cdf` | Same function. `NORMDIST(x,0,1,FALSE)` for the density becomes `norm.pdf`. **Implemented.** |
+
+| — | Practical C asks only for delta and vega | Gamma added as a closed form too | Task D asks you to notice that the gradient of the delta-versus-spot chart *is* gamma. Having gamma available makes that claim checkable rather than assertable, and `tests/test_blackscholes.py` verifies the two agree numerically. Additive; nothing from the practical is displaced. |
+| — | The book suggests testing flex sizes by hand | A bump-size sweep with the error curve plotted | Practical C, Task C asks what happens as the flex grows and shrinks. Turning that into a measured U-shaped curve — truncation error on one side, floating-point cancellation on the other — makes the answer concrete. Notebook 05 plots it; `test_bump_size_sweep_degrades_at_both_extremes` asserts it. |
+| [CONVENTION] | The book does not give a general rule for which currency pays the premium; it gives examples (EUR/USD is CCY2, EUR/JPY and USD/JPY are CCY1) | `CurrencyPair.premium_side` returns CCY1 when CCY2 is JPY, else CCY2 | Reproduces every example the book gives, but it is an inference from three data points, not a stated rule — and in practice the premium currency is agreed per trade. Flagged in the property's own docstring; override explicitly when it matters. |
 
 ---
 
@@ -103,3 +107,6 @@ constant and repeated in `notes/source_notes.md`. *(planned)*
 | [CONVENTION] | Volatilities are decimals internally (0.085, not 8.5). Conversion happens at the market data provider boundary and nowhere else. There is a test that fails if any provider returns a volatility above 1.0. *(planned)* |
 | [CONVENTION] | Rates are continuously compounded everywhere, per Chapter 5 and Chapter 10. No curve building, no basis, no credit — the book sets all three aside explicitly in its Preface and so do we. |
 | [SCOPE] | Practical G onwards (Chapter 13+) is out of scope for this pass. |
+| — | **Cross-validation tolerances are measured, not guessed.** Practical B's integration agrees with Practical C's closed form to 2.3e-3 relative on the book's own grid (0.1 sd steps) and 5.7e-6 at 0.01 steps. The residual is trapezoidal discretisation error, and it converges second-order — halving the step cuts it roughly fourfold. `tests/test_cross_validation.py` asserts the convergence as well as the agreement, so a genuine regression cannot hide behind a loose tolerance. |
+| — | **The forward payoff is checked in absolute terms, not relative.** A forward's value is a small difference of two large numbers, so relative error against it overstates disagreement by roughly the ratio between them. Same reason Practical B's Test 1 can only be stated as "approximately zero". |
+| — | Doctests in the package run as part of the default `pytest` invocation (`addopts = "--doctest-modules"`), so the book's acceptance values embedded in docstrings fail loudly if they ever drift. |

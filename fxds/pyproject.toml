@@ -38,7 +38,10 @@ bloomberg = ["xbbg>=0.7"]
 eikon = ["eikon>=1.1"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+# Doctests in the package run alongside the test suite: the acceptance values in
+# the docstrings are the book's, and they should fail loudly if they drift.
+testpaths = ["tests", "fxds"]
+addopts = "--doctest-modules"
 filterwarnings = ["error::RuntimeWarning"]
 
 [tool.hatch.build.targets.wheel]
