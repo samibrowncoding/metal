@@ -1,0 +1,6 @@
+# Cached market data is machine-local; the provider and timestamp are recorded
+# in each file, but the files themselves are not source.
+data/cache/*.parquet
+.ipynb_checkpoints/
+.pytest_cache/
+*.egg-info/
