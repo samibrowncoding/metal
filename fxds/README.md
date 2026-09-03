@@ -102,7 +102,7 @@ and the task list for the build order.
 - [x] **Stage 1** — source notes, repo skeleton, learning path
 - [x] **Stage 2** — Practicals B and C, notebooks and tests
 - [x] **Stage 3** — Practical A simulator and Streamlit app
-- [ ] Stage 4 — Practicals D, E, F and the assembled surface
+- [x] **Stage 4** — Practicals D, E, F and the assembled surface
 - [ ] Stage 5 — Chapters 6–9 concept notebooks
 - [ ] Stage 6 — market data layer
 - [ ] Stage 7 — glossary, README polish, final learning path pass

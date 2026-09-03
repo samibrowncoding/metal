@@ -63,12 +63,12 @@ already taken in `notes/source_notes.md` but not yet in code.
 
 | Tag | Book | Here | Why |
 |---|---|---|---|
-| [FIX] | Invalid tenor pops a `MsgBox` and returns `−1` | Raises a specific exception | A sentinel return that is also a valid-looking number is a bug waiting to happen. The book's own Practical E code then has to test for it. *(planned)* |
-| [EXCEL] | Dates as `Long` (Excel serial numbers) | `datetime.date` | Excel stores dates as integers from 1900; Python does not need to. *(planned)* |
-| [SCOPE] | Chapter 10 describes end-end and month-overflow delivery-date conventions; Practical D explicitly ignores them | Marked as documented `TODO`s in `dates.py`, with the Chapter 10 rules written out | Matching the practical's scope, but the reader should know exactly what is missing and what the real rule is. *(planned)* |
-| [SCOPE] | No holiday calendar (weekends only) | Same, but the business-day functions take an injectable calendar | The practical's simplification, kept — with the seam left open so it can be fixed without reworking call sites. *(planned)* |
-| [SCOPE] | T+2 settlement assumed throughout | Same, parameterised | Chapter 10 notes T+1 pairs (USD/CAD, USD/TRY) and the USD-clearing rule. Neither is implemented. *(planned)* |
-| [CONVENTION] | Week tenors are added to the horizon with no business-day adjustment, so `horizon + 7n` could in principle land on a weekend | Implemented as the book has it; Chapter 10's rule (such a tenor is invalid) is noted in the docstring | The practical's code and Chapter 10's prose differ slightly here. Following the code, documenting the prose. *(planned)* |
+| [FIX] | Invalid tenor pops a `MsgBox` and returns `−1` | Raises `InvalidTenorError` | A sentinel return that is also a valid-looking date serial is a bug waiting to happen. The book's own Practical E code then has to test for it. **Implemented.** |
+| [EXCEL] | Dates as `Long` (Excel serial numbers) | `datetime.date` | Excel stores dates as integers from 1900; Python does not need to. **Implemented.** |
+| [SCOPE] | Chapter 10 describes end-end and month-overflow delivery-date conventions; Practical D explicitly ignores them | Documented `TODO`s in `dates.py` with the Chapter 10 rules written out, and demonstrated in notebook 09 | Matching the practical's scope. Worth noting `relativedelta` happens to agree with the month-overflow convention by arithmetic accident (it clamps 30 Jan + 1M to 28 Feb) but does **not** implement end-end. Code that accidentally agrees with a convention diverges the moment inputs change. **Implemented as documented gaps.** |
+| [SCOPE] | No holiday calendar (weekends only) | Same, but every function takes an injectable `HolidayCalendar` callable | The practical's simplification, kept with the seam open. Notebook 09 measures what a calendar changes: expiries move too, not just deliveries, because month expiries are derived *backwards* from delivery through business-day stepping. **Implemented.** |
+| [SCOPE] | T+2 settlement assumed throughout | Same, but `lag` is a parameter on every function | Chapter 10 notes T+1 pairs (USD/CAD, USD/TRY) and the USD-clearing rule (nothing settles on a US holiday even in non-USD pairs). The lag is parameterised; the USD-clearing rule is not implemented. |
+| [CONVENTION] | Week tenors are added to the horizon with no business-day adjustment, so `horizon + 7n` can land on a weekend | Follows the practical's code; Chapter 10's stricter rule is exposed separately as `validate_day_week_expiry` | **The book contradicts itself here** — Chapter 10's prose says such a tenor is invalid, Practical D's VBA does no check. Following the code and making the prose rule available, rather than silently picking one. **Implemented.** |
 
 ---
 
@@ -76,13 +76,13 @@ already taken in `notes/source_notes.md` but not yet in code.
 
 | Tag | Book | Here | Why |
 |---|---|---|---|
-| [FIX] | `getATMVol` returns `−1` for query dates outside the tenor range | Raises an explicit exception | Same reasoning as Practical D. A `−1` volatility will propagate silently into a variance and produce something that looks like a number. *(planned)* |
-| [FIX] | The printed `LinearVolatilityInterpolation` function assigns to `LinearVarianceInterpolation` — the wrong name | Two separate, correctly named functions | Transcription error in the book. *(planned)* |
-| [EXCEL] | Subroutines push values onto sheet ranges (`populateATMImpliedVolatilities`, `populateVariance`, `populateDayWeights`) | Functions returning DataFrames | The sheet is the book's data structure; a DataFrame is ours. *(planned)* |
-| [EXCEL] | `Weekday()` used as an offset into the day-weight lookup table | A weekday-keyed mapping | The book calls the offset trick "cunning", which is Excel for "fragile". *(planned)* |
-| [CONVENTION] | Day-count is 365 throughout | Same | The book uses `/365` everywhere without discussing ACT/365 versus ACT/360 or business-day counts. Kept as-is; noted because it is a real convention choice. *(planned)* |
-| — | Task B fits the model to market tenors visually | Adds a least-squares calibration reporting fit error | Explicitly beyond the book, as requested. Additive, not a replacement. *(planned)* |
-| — | Weekend weights set to exactly zero | Same for the staged demonstration, but the chapter's note that desks use a small non-zero weekend weight is carried into the notebook | Chapter 11 flags it; the practical simplifies it. Both are worth knowing. *(planned)* |
+| [FIX] | `getATMVol` returns `−1` for query dates outside the tenor range | Raises `CurveRangeError` | Same reasoning as Practical D. A `−1` volatility will propagate silently into a variance and produce something that looks like a number. **Implemented.** |
+| [FIX] | The printed `LinearVolatilityInterpolation` function assigns to `LinearVarianceInterpolation` — the wrong name | Two separate, correctly named functions | Transcription error in the book — as printed the function returns nothing useful. **Implemented.** |
+| [EXCEL] | Subroutines push values onto sheet ranges (`populateATMImpliedVolatilities`, `populateVariance`, `populateDayWeights`) | Functions returning DataFrames | The sheet is the book's data structure; a DataFrame is ours. **Implemented.** |
+| [EXCEL] | `Weekday()` used as an offset into the day-weight lookup table | A weekday-keyed dict, plus per-date overrides for events and holidays | The book calls the offset trick "cunning", which is Excel for "fragile". **Implemented.** |
+| [CONVENTION] | Day-count is 365 throughout | Same, as the module constant `DAYS_PER_YEAR` | The book uses `/365` everywhere without discussing ACT/365 versus ACT/360 or business-day counts. Kept as-is; noted because it is a real convention choice, not a neutral default. |
+| — | Task B fits the model to market tenors visually | Adds a `calibrate_parametric` least-squares fit reporting RMSE and max error | Explicitly beyond the book. The per-tenor residual **is** the manual override Chapter 11 describes a trader inputting, computed rather than eyeballed. Additive; the manual path still works. **Implemented.** |
+| — | Weekend weights set to exactly zero | Same for the staged demonstration; `WEEKEND_ZERO_WEIGHTS`' docstring and notebook 10 both carry Chapter 11's note that desks use a small non-zero weight because weekend news can gap spot on the Monday open | Chapter 11 flags it; the practical simplifies it. **Implemented.** |
 
 ---
 
@@ -90,18 +90,31 @@ already taken in `notes/source_notes.md` but not yet in code.
 
 | Tag | Book | Here | Why |
 |---|---|---|---|
-| [EXCEL] | 0% and 100% delta replaced with 0.01% and 99.99% to keep the strike finite | Same | Not an Excel artefact — the strike genuinely diverges. Kept and explained. *(planned)* |
-| [SCOPE] | Malz smile on outright deltas | Same | Chapter 12 explains at length that the interbank market trades the **broker fly**, whose strikes are not the outright strikes and which carries vanna when valued on the smile. Practical F does not implement it, and neither do we. This is the single largest simplification in the vol surface and is stated in `smile.py`, `surface.py` and the notebook. *(planned)* |
-| [SCOPE] | Spot delta throughout | Same | Chapter 12 notes that long-dated G10 and EM risk reversals are usually quoted on forward delta, and Chapter 8 notes premium-adjusted delta in CCY1-premium pairs. Neither is implemented; both are flagged. *(planned)* |
-| — | Malz gives a 25d/10d risk reversal multiplier of 1.6 | Same, with the discrepancy stated | Chapter 12 says the market value is usually around 1.8, so the model understates 10d skew. A limitation of the parameterisation, not of the implementation. *(planned)* |
+| [EXCEL] | 0% and 100% delta replaced with 0.01% and 99.99% to keep the strike finite | Same, as `DELTA_FLOOR` and `DELTA_CAP` | Not an Excel artefact — the strike genuinely diverges. **Implemented**, and see the attainability row below for a tighter bound the book never surfaces. |
+| [SCOPE] | Malz smile on outright deltas | Same | Chapter 12 explains at length that the interbank market trades the **broker fly**, whose strikes are generated ignoring the risk reversal and so are not the outright strikes, and which carries vanna when valued on the smile. Chapter 12's 5yr AUD/JPY example has the outright 25d put at 46.05 against the broker fly's 49.60 — not a rounding difference. Practical F does not implement it and neither do we. **The single largest simplification in the surface**, stated first in `surface.SIMPLIFICATIONS`, in `smile.py`'s module docstring, and in notebook 11. |
+| [SCOPE] | Spot delta throughout | Same | Chapter 12 notes long-dated G10 and EM risk reversals are usually quoted on forward delta; Chapter 8 notes premium-adjusted delta in CCY1-premium pairs moves the zero-delta straddle strike to the other side of the forward. Neither implemented; both flagged in `surface.SIMPLIFICATIONS`. |
+| — | Malz gives a 25d/10d risk reversal multiplier of 1.6 | Same, exposed as `MalzSmile.rr10_implied` with the discrepancy in its docstring | Chapter 12 says the market value is usually around 1.8, so the model understates 10d skew. A limitation of the parameterisation, not of the implementation. **Implemented and asserted in tests.** |
+
+| — | Not in the book | `max_attainable_put_delta(r_ccy1, T)` | Since `delta_put = exp(-r1*T)*[N(d1)-1]` and the bracket lies in `(-1, 0)`, the signed put delta is bounded by `-exp(-r1*T)`. **With a 10% CCY1 rate over a year there is no such thing as a 95 delta put.** The book's examples use modest rates and never reach the bound, so it is never mentioned. `strike_placement` omits unattainable deltas rather than raising; `smile_by_strike` clips its sweep. |
+| — | The book states flatly that a higher CCY1 rate moves "the whole volatility smile lower" | True for the body of the smile; **reverses in the deep wing** near the attainability bound | As the CCY1 rate rises, `exp(r1*T)*delta + 1` collapses toward zero and the inverse normal dives, pushing the strike *out* faster than the lower forward pulls it *in*. Both behaviours are asserted in `tests/test_smile.py` rather than the inconvenient one being hidden. The book's claim is correct for the deltas its own examples use. |
 
 ---
 
 ## Assembled volatility surface (`surface.py`)
 
 Not in the book at all — the book builds the ATM curve and the smile separately and never
-joins them. Simplifications it carries are listed in the module's `SIMPLIFICATIONS`
-constant and repeated in `notes/source_notes.md`. *(planned)*
+joins them. Eight simplifications are listed in the module's `SIMPLIFICATIONS` constant,
+printed by `explain_simplifications()`, and repeated in `notes/source_notes.md`.
+
+Two composition choices worth calling out specifically, because the book gives no guidance
+on either:
+
+| Tag | Choice | Why |
+|---|---|---|
+| [CONVENTION] | Day weights compose **multiplicatively** with the interpolated core curve: the tenor ATM is scaled by the weighted-to-flat volatility ratio at that date | Chapter 11 says desks combine a core curve with weights on top but does not say how. This form keeps the quoted tenor levels roughly intact while letting the weights shape the days between. A different desk would do it differently. |
+| [CONVENTION] | Smile parameters (RR and fly) interpolate **linearly in time** between tenors, held flat beyond the ends | Chapter 12 explicitly declines to pick a method, noting desks interpolate in delta, strike or model-parameter terms. Linear-in-time is the simplest defensible choice and is stated as such. |
+| — | `volatility(expiry, strike)` solves by fixed-point iteration | This direction genuinely *is* circular (unlike strike-from-delta, which is not — see `strike_placement`'s docstring). The test asserts the fixed point is self-consistent, not merely that the loop terminates. |
+| — | Non-negative forward variance is **checked**, not guaranteed | Chapter 11 notes real desks construct curves so the guarantee holds structurally. Notebook 10, Experiment 7 shows the day-weight layer *cannot* create the arbitrage — only the interpolation can — so the check targets the right place. |
 
 ---
 
